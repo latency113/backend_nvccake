@@ -22,3 +22,39 @@ export const OrderSchema = t.Object({
 });
 
 export type Order = typeof OrderSchema.static;
+
+// Reference schemas to avoid circular dependencies
+const ClassroomReferenceSchema = t.Object({
+  id: t.String(),
+  name: t.String(),
+  teacher_id: t.String(),
+  department_id: t.String(),
+  grade_level_id: t.String(),
+});
+
+const TeamReferenceSchema = t.Object({
+  id: t.String(),
+  name: t.String(),
+  classroom_id: t.String(),
+});
+
+const OrderItemReferenceSchema = t.Object({
+  id: t.String(),
+  order_id: t.String(),
+  product_id: t.String(),
+  pound: t.Number(),
+  quantity: t.Number(),
+  unitPrice: t.Number(),
+  subtotal: t.Number(),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
+});
+
+export const OrderWithRelationsSchema = t.Composite([
+  OrderSchema,
+  t.Object({
+    classroom: t.Optional(ClassroomReferenceSchema),
+    team: t.Optional(TeamReferenceSchema),
+    order_items: t.Array(OrderItemReferenceSchema),
+  }),
+]);

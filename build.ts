@@ -1,6 +1,8 @@
-Bun.build({
-  entrypoints: ['./src/index.ts'],
-  outdir: './dist',
+import Bun from "bun"
+
+await Bun.build({
+  entrypoints: ["src/index.ts"],
   minify: true,
-  target: 'node',
-});
+  outdir: "./dist",
+  target: "bun",
+})

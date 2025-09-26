@@ -25,16 +25,36 @@ export namespace TeacherRepository {
         }
       : {};
 
-    return prisma.teacher.findMany({
+    const teachers = await prisma.teacher.findMany({
       where,
       include: {
         classroom: {
-          include: {grade_level: true }
+          include: {
+            grade_level: true,
+            department: true,
+            teacher: true,
+            teams: {
+              select: {
+                id: true
+              }
+            },
+            orders: {
+              select: {
+                id: true
+              }
+            }
+          }
         }
       },
       take: options.take,
       skip: options.skip,
     });
+
+    // Transform each teacher to ensure classroom array is present
+    return teachers.map(teacher => ({
+      ...teacher,
+      classroom: teacher.classroom || [] // Ensure classroom is always an array
+    }));
   }
 
   export async function findById(teacherId: string) {

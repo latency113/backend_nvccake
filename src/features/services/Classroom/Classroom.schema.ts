@@ -1,9 +1,4 @@
 import { t } from "elysia";
-import { DepartmentSchema } from "../Department/Department.schema";
-import { GradeLevelSchema } from "../GradeLevel/GradeLevel.schema";
-import { TeamSchema } from "../Team/Team.schema";
-import { OrderSchema } from "../Order/Order.schema";
-import { TeacherSchema, TeacherWithRelationsSchema } from "../Teacher/Teacher.schema";
 
 export const ClassroomSchema = t.Object({
   id: t.String(),
@@ -15,13 +10,31 @@ export const ClassroomSchema = t.Object({
 
 export type Classroom = typeof ClassroomSchema.static;
 
+// Define the teacher schema with classroom array
+const TeacherWithClassroomsSchema = t.Object({
+  id: t.String(),
+  name: t.String(),
+  classroom: t.Array(ClassroomSchema),
+});
+
 export const ClassroomWithAllRelationsSchema = t.Composite([
   ClassroomSchema,
   t.Object({
-    teacher: t.Recursive(() => TeacherWithRelationsSchema),
-    department: DepartmentSchema,
-    grade_level: GradeLevelSchema,
-    teams: t.Array(TeamSchema),
-    orders: t.Array(OrderSchema),
+    teacher: TeacherWithClassroomsSchema,
+    department: t.Object({
+      id: t.String(),
+      name: t.String(),
+    }),
+    grade_level: t.Object({
+      id: t.String(),
+      level: t.UnionEnum(["VOCATIONAL","HIGHER"]),
+      year: t.Number()
+    }),
+    teams: t.Array(t.Object({
+      id: t.String(),
+    })),
+    orders: t.Array(t.Object({
+      id: t.String(),
+    })),
   }),
 ]);

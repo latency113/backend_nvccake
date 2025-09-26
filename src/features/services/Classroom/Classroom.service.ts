@@ -43,8 +43,17 @@ export namespace ClassroomService {
     const nextPage = page < totalPages;
     const previousPage = page > 1;
 
+    // Transform the data to ensure teacher has a classroom array
+    const transformedClassrooms = Classrooms.map(classroom => ({
+      ...classroom,
+      teacher: {
+        ...classroom.teacher,
+        classroom: [classroom]  // Add this classroom to the teacher's classroom array
+      }
+    }));
+
     return {
-      data: Classrooms,
+      data: transformedClassrooms,
       meta_data: {
         page,
         itemsPerPage,
