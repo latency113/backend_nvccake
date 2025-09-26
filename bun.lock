@@ -7,6 +7,7 @@
         "@elysiajs/cors": "^1.4.0",
         "@elysiajs/jwt": "^1.4.0",
         "@elysiajs/swagger": "^1.3.1",
+        "@prisma/client": "^6.16.2",
         "elysia": "latest",
       },
       "devDependencies": {
@@ -89,6 +90,8 @@
     "@gitmoji/gitmoji-regex": ["@gitmoji/gitmoji-regex@1.0.0", "", { "dependencies": { "emoji-regex": "^10", "gitmojis": "^3" } }, "sha512-+BFXxcWCxn0UIYuG1v5n9SfaCCS8tw95j1x3QsTJRdGGiihRyVLTHiu1wrHlzH3z4nYXKjCKiZFTdWwMjRI+gQ=="],
 
     "@gitmoji/parser-opts": ["@gitmoji/parser-opts@1.4.0", "", { "dependencies": { "@gitmoji/gitmoji-regex": "1.0.0" } }, "sha512-zzmx/vtpdB/ijjUm7u9OzHNCXWKpSbzVEgVzOzhilMgoTBlUDyInZFUtiCTV+Wf4oCP9nxGa/kQGQFfN+XLH1g=="],
+
+    "@prisma/client": ["@prisma/client@6.16.2", "", { "peerDependencies": { "prisma": "*", "typescript": ">=5.1.0" }, "optionalPeers": ["prisma", "typescript"] }, "sha512-E00PxBcalMfYO/TWnXobBVUai6eW/g5OsifWQsQDzJYm7yaY+IRLo7ZLsaefi0QkTpxfuhFcQ/w180i6kX3iJw=="],
 
     "@prisma/config": ["@prisma/config@6.16.2", "", { "dependencies": { "c12": "3.1.0", "deepmerge-ts": "7.1.5", "effect": "3.16.12", "empathic": "2.0.0" } }, "sha512-mKXSUrcqXj0LXWPmJsK2s3p9PN+aoAbyMx7m5E1v1FufofR1ZpPoIArjjzOIm+bJRLLvYftoNYLx1tbHgF9/yg=="],
 

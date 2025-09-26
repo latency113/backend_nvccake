@@ -13,12 +13,12 @@
     "db:migrate": "bun x prisma migrate dev",
     "prepare": "husky install",
     "commit": "cz"
-
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.0",
     "@elysiajs/jwt": "^1.4.0",
     "@elysiajs/swagger": "^1.3.1",
+    "@prisma/client": "^6.16.2",
     "elysia": "latest"
   },
   "devDependencies": {
@@ -39,5 +39,4 @@
       "config": "./.cz-config.cjs"
     }
   }
-  
 }
