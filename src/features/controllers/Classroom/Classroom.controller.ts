@@ -1,18 +1,18 @@
 import Elysia, { t } from "elysia";
-import { UserSchema } from "../../services/User/User.schema";
-import { UserService } from "../../services/User/User.service";
+import { ClassroomSchema, ClassroomWithAllRelationsSchema } from "../../services/Classroom/Classroom.schema";
+import { ClassroomService } from "../../services/Classroom/Classroom.service";
 
-export namespace UserController {
-  export const userController = new Elysia({ prefix: "/users" })
+export namespace ClassroomController {
+  export const classroomController = new Elysia({ prefix: "/Classrooms" })
     .post(
       "/",
       async ({ body, set }) => {
         try {
-          const newUser = await UserService.create(body);
+          const newClassroom = await ClassroomService.create(body);
           set.status = 201;
-          return {  newUser, message: "User has created" };
+          return {  newClassroom, message: "Classroom has created" };
         } catch (error: any) {
-          if (error.message === "Username already exists") {
+          if (error.message === "Classroomname already exists") {
             set.status = "Conflict";
             return error.message;
           }
@@ -24,16 +24,16 @@ export namespace UserController {
         }
       },
       {
-        body: t.Omit(UserSchema, ["id", "role", "createdAt", "updatedAt"]),
+        body: t.Omit(ClassroomSchema, ["id"]),
         response: {
           201: t.Object({
-            newUser: UserSchema,
+            newClassroom: ClassroomSchema,
             message: t.String(),
           }),
           409: t.String(),
           500: t.String(),
         },
-        tags: ["Users"],
+        tags: ["Classrooms"],
       }
     )
     .get(
@@ -45,7 +45,7 @@ export namespace UserController {
           : 10;
         const search = query.search;
 
-        const result = await UserService.findAll({
+        const result = await ClassroomService.findAll({
           page,
           itemsPerPage,
           search,
@@ -54,7 +54,7 @@ export namespace UserController {
         if (result.data.length === 0 && search !== undefined) {
           set.status = "Not Found";
           return {
-            message: "No User found matching your search query.",
+            message: "No Classroom found matching your search query.",
           };
         }
 
@@ -68,7 +68,7 @@ export namespace UserController {
         }),
         response: {
           200: t.Object({
-            data: t.Array(UserSchema),
+            data: t.Array(ClassroomWithAllRelationsSchema),
             meta_data: t.Object({
               page: t.Number(),
               itemsPerPage: t.Number(),
@@ -83,35 +83,35 @@ export namespace UserController {
           }),
           500: t.String(),
         },
-        tags: ["Users"],
+        tags: ["Classrooms"],
       }
     )
     .get(
-      "/:userId",
+      "/:ClassroomId",
       async ({ params }) => {
-        const getuserById = await UserService.findById(params.userId);
-        return getuserById;
+        const getClassroomById = await ClassroomService.findById(params.ClassroomId);
+        return getClassroomById;
       },
       {
         params: t.Object({
-          userId: t.String(),
+          ClassroomId: t.String(),
         }),
         response: {
-          200: UserSchema,
+          200: ClassroomSchema,
           500: t.String(),
         },
-        tags: ["Users"],
+        tags: ["Classrooms"],
       }
     )
     .patch(
-      "/:userId",
+      "/:ClassroomId",
       async ({ params, body, set }) => {
         try {
-          const updateuser = await UserService.update(params.userId, body);
+          const updateClassroom = await ClassroomService.update(params.ClassroomId, body);
           set.status = "OK";
-          return {  updateuser, message: "User has updated" };
+          return {  updateClassroom, message: "Classroom has updated" };
         } catch (error: any) {
-          if (error.message === "Username already exists") {
+          if (error.message === "Classroomname already exists") {
             set.status = "Conflict";
             return error.message;
           }
@@ -123,25 +123,25 @@ export namespace UserController {
         }
       },
       {
-        body: t.Partial(t.Omit(UserSchema, ["id", "createdAt", "updatedAt"])),
+        body: t.Partial(t.Omit(ClassroomSchema, ["id"])),
         params: t.Object({
-          userId: t.String(),
+          ClassroomId: t.String(),
         }),
         response: {
-          200: UserSchema,
+          200: ClassroomSchema,
           409: t.String(),
           500: t.String(),
         },
-        tags: ["Users"],
+        tags: ["Classrooms"],
       }
     )
     .delete(
-      "/:userId",
+      "/:ClassroomId",
       async ({ params, set }) => {
         try {
-          const deleteUser = await UserService.deleteById(params.userId);
+          const deleteClassroom = await ClassroomService.deleteById(params.ClassroomId);
           set.status = "OK";
-          return {deleteUser, message: "User has deleted"};
+          return {deleteClassroom, message: "Classroom has deleted"};
         } catch (error: any) {
           set.status = "Internal Server Error";
           if ("message" in error) {
@@ -152,13 +152,13 @@ export namespace UserController {
       },
       {
         params: t.Object({
-          userId: t.String(),
+          ClassroomId: t.String(),
         }),
         response: {
-          200: UserSchema,
+          200: ClassroomSchema,
           500: t.String(),
         },
-        tags: ["Users"],
+        tags: ["Classrooms"],
       }
     )
 }

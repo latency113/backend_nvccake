@@ -1,10 +1,10 @@
 import prisma from "@/providers/database/database.provider";
-import { userSchema } from "@/features/services/User/User.schema";
+import { UserSchema } from "@/features/services/User/User.schema";
 
 export namespace UserRepository {
   export async function create(
     user: Pick<
-      typeof userSchema,
+      typeof UserSchema,
       "firstname" | "lastname" | "username" | "email" | "password"
     >
   ) {
@@ -48,7 +48,7 @@ export namespace UserRepository {
     userId: string,
     user: Partial<
       Pick<
-        typeof userSchema,
+        typeof UserSchema,
         "firstname" | "lastname" | "username" | "email" | "password" | "role"
       >
     >

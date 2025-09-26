@@ -1,11 +1,11 @@
 import swagger from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 import { corsMiddleware } from "./shared/middleware/cors";
-import { UserController } from "./features/controllers/User/user.controller";
 import jwt from "@elysiajs/jwt";
+import { app as mainApp } from "./features/controllers";
 
 const app = new Elysia()
-  .group("/api/v1", (app) => app.use(UserController.userController))
+  .use(mainApp)
   .use(swagger({ path: "/docs" }))
   .use(
     jwt({

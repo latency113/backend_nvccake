@@ -1,12 +1,24 @@
-import { UserRepository } from "@/features/repository/User/user.repository";
-import { userSchema } from "./User.schema";
+import { UserRepository } from "@/features/repository/User/User.repository";
+import { UserSchema } from "./User.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace UserService {
   export async function create(
-    user: Omit<typeof userSchema, "id" | "createdAt" | "updatedAt">
+    user: Omit<typeof UserSchema, "id" | "createdAt" | "updatedAt">
   ) {
+    if (!user.firstname || user.firstname.trim() === '') {
+      throw new Error('User firstname is required and cannot be empty.');
+    }
+    if (!user.lastname || user.lastname.trim() === '') {
+      throw new Error('User lastname is required and cannot be empty.');
+    }
+    if (!user.username || user.username.trim() === '') {
+      throw new Error('User username is required and cannot be empty.');
+    }
+    if (!user.password || user.password.trim() === '') {
+      throw new Error('User password is required and cannot be empty.');
+    }
     try {
       const hashPassword = await Bun.password.hash(user.password);
       return await UserRepository.create({
@@ -60,7 +72,7 @@ export namespace UserService {
     userId: string,
     user: Partial<
       Pick<
-        typeof userSchema,
+        typeof UserSchema,
         "firstname" | "lastname" | "username" | "email" | "password" | "role"
       >
     >

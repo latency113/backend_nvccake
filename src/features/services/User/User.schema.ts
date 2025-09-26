@@ -1,6 +1,6 @@
 import { t } from "elysia"
 
-export const userSchema = t.Object({
+export const UserSchema = t.Object({
     id: t.String(),
     firstname: t.String(),
     lastname: t.String(),
@@ -8,11 +8,9 @@ export const userSchema = t.Object({
     email: t.String(),
     password: t.String(),
     role: t.UnionEnum(["USER", "ADMIN","OFFICER","SUPERADMIN"]),
-    createdAt :t.Date(),
-    updatedAt :t.Date(),
 })
 
-export type User = typeof userSchema.static
+export type User = typeof UserSchema.static
 
 //   id        String  @id @default(auto()) @map("_id") @db.ObjectId
 //   firstname String

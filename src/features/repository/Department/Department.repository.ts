@@ -1,0 +1,81 @@
+import prisma from "@/providers/database/database.provider";
+import { DepartmentSchema } from "@/features/services/Department/Department.schema";
+
+export namespace DepartmentRepository {
+  export async function create(
+    department: Pick<typeof DepartmentSchema, "name">
+  ) {
+    return prisma.department.create({
+      data: {
+        ...department,
+      },
+    });
+  }
+
+  export async function findAll(options: {
+    skip: number;
+    take: number;
+    search?: string;
+  }) {
+    const where = options.search
+      ? {
+          name: {
+            contains: options.search,
+          },
+        }
+      : {};
+
+    return prisma.department.findMany({
+      where,
+      include: {
+        classroom: {
+          include: {grade_level: true }
+        },
+        cakeRequest: true
+      },
+      take: options.take,
+      skip: options.skip,
+    });
+  }
+
+  export async function findById(departmentId: string) {
+    return await prisma.department.findUnique({
+      where: {
+        id: departmentId,
+      },
+    });
+  }
+
+  export async function update(
+    departmentId: string,
+    department: Partial<Pick<typeof DepartmentSchema, "name">>
+  ) {
+    return prisma.department.update({
+      where: {
+        id: departmentId,
+      },
+      data: {
+        ...department,
+      },
+    });
+  }
+
+  export async function deleteById(departmentId: string) {
+    return prisma.department.delete({
+      where: {
+        id: departmentId,
+      },
+    });
+  }
+
+  export async function countAll(search?: string) {
+    const where = search
+      ? {
+          name: {
+            contains: search,
+          },
+        }
+      : {};
+    return await prisma.department.count({ where });
+  }
+}

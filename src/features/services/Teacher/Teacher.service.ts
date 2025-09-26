@@ -1,24 +1,24 @@
-import { DepartmentRepository } from "@/features/repository/Department/Department.repository"
-import { DepartmentSchema } from "./Department.schema";
+import { TeacherRepository } from "@/features/repository/Teacher/Teacher.repository"
+import { TeacherSchema } from "./Teacher.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
-export namespace DepartmentService {
+export namespace TeacherService {
   export async function create(
-    Department: Omit<typeof DepartmentSchema, "id">
+    Teacher: Omit<typeof TeacherSchema, "id">
   ) {
-    if (!Department.name || Department.name.trim() === '') {
-      throw new Error('Department name is required and cannot be empty.');
+    if (!Teacher.name || Teacher.name.trim() === '') {
+      throw new Error('Teacher name is required and cannot be empty.');
     }
     try {
-      const newDepartment = DepartmentRepository.create(Department);
-      return newDepartment;
+      const newTeacher = TeacherRepository.create(Teacher);
+      return newTeacher;
     } catch (error: any) {
       if (
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new Error("Departmentname already exists");
+        throw new Error("Teachername already exists");
       }
       throw error;
     }
@@ -32,19 +32,19 @@ export namespace DepartmentService {
     const search = options.search;
 
     const { skip, take } = getPaginationParams(page, itemsPerPage);
-    const Departments = await DepartmentRepository.findAll({
+    const Teachers = await TeacherRepository.findAll({
       skip,
       take,
       search,
     });
-    const total = await DepartmentRepository.countAll(search);
+    const total = await TeacherRepository.countAll(search);
 
     const totalPages = ((total + itemsPerPage - 1) / itemsPerPage) >> 0;
     const nextPage = page < totalPages;
     const previousPage = page > 1;
 
     return {
-      data: Departments,
+      data: Teachers,
       meta_data: {
         page,
         itemsPerPage,
@@ -56,29 +56,29 @@ export namespace DepartmentService {
     };
   }
 
-  export async function findById(DepartmentId: string) {
-    return DepartmentRepository.findById(DepartmentId);
+  export async function findById(TeacherId: string) {
+    return TeacherRepository.findById(TeacherId);
   }
 
   export async function update(
-    DepartmentId: string,
-    Department: Partial<Pick<typeof DepartmentSchema, "name">>
+    TeacherId: string,
+    Teacher: Partial<Pick<typeof TeacherSchema, "name">>
   ) {
     try {
-      const data = { ...Department };
-      return await DepartmentRepository.update(DepartmentId, data);
+      const data = { ...Teacher };
+      return await TeacherRepository.update(TeacherId, data);
     } catch (error: any) {
       if (
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new Error("Departmentname already exists");
+        throw new Error("Teachername already exists");
       }
       throw error;
     }
   }
 
-  export async function deleteById(DepartmentId: string) {
-    return DepartmentRepository.deleteById(DepartmentId);
+  export async function deleteById(TeacherId: string) {
+    return TeacherRepository.deleteById(TeacherId);
   }
 }
