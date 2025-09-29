@@ -6,6 +6,8 @@ export const ClassroomSchema = t.Object({
   teacher_id: t.String(),
   department_id: t.String(),
   grade_level_id: t.String(),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
 });
 
 export type Classroom = typeof ClassroomSchema.static;
@@ -27,14 +29,18 @@ export const ClassroomWithAllRelationsSchema = t.Composite([
     }),
     grade_level: t.Object({
       id: t.String(),
-      level: t.UnionEnum(["VOCATIONAL","HIGHER"]),
-      year: t.Number()
+      level: t.UnionEnum(["VOCATIONAL", "HIGHER"]),
+      year: t.Number(),
     }),
-    teams: t.Array(t.Object({
-      id: t.String(),
-    })),
-    orders: t.Array(t.Object({
-      id: t.String(),
-    })),
+    teams: t.Array(
+      t.Object({
+        id: t.String(),
+      })
+    ),
+    orders: t.Array(
+      t.Object({
+        id: t.String(),
+      })
+    ),
   }),
 ]);

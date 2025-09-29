@@ -52,6 +52,8 @@ model Classroom {
   teacher_id     String @db.ObjectId
   department_id  String @db.ObjectId
   grade_level_id String @db.ObjectId
+  createAt       DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   teacher     Teacher     @relation(fields: [teacher_id], references: [id])
   department  Department  @relation(fields: [department_id], references: [id])
@@ -93,6 +95,9 @@ model Team {
   name         String
   classroom_id String @db.ObjectId
 
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   classroom Classroom @relation(fields: [classroom_id], references: [id])
   orders    Order[]
 }
@@ -101,6 +106,9 @@ model Product {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   name  String
   price Float
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   orderItems OrderItem[]
 }
@@ -122,7 +130,7 @@ model Order {
   status       OrderStatus @default(pending)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
-  order_items   OrderItem[]
+  order_items  OrderItem[]
 
   team      Team?      @relation(fields: [team_id], references: [id])
   classroom Classroom? @relation(fields: [classroom_id], references: [id])
@@ -179,17 +187,19 @@ model CakeRequestItems {
 model Teacher {
   id        String      @id @default(auto()) @map("_id") @db.ObjectId
   name      String
+  createAt  DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   classroom Classroom[]
 }
 
 model Token {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  token        String   @unique
-  user_id      String   @db.ObjectId
-  expires_at   DateTime
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  token      String   @unique
+  user_id    String   @db.ObjectId
+  expires_at DateTime
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
   user User @relation(fields: [user_id], references: [id])
 
   @@index([user_id], name: "idx_token_user_id")

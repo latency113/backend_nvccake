@@ -4,6 +4,8 @@ export const ProductSchema = t.Object({
   id: t.String(),
   name: t.String(),
   price: t.Number(),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
 });
 
 export type Product = typeof ProductSchema.static;

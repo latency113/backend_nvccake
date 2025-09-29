@@ -3,6 +3,8 @@ import { t } from "elysia";
 export const TeacherSchema = t.Object({
   id: t.String(),
   name: t.String(),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
 });
 export type Teacher = typeof TeacherSchema.static;
 
