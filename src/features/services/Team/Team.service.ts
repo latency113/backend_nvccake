@@ -1,14 +1,14 @@
-import { TeamRepository } from "@/features/repository/Team/Team.repository"
+import { TeamRepository } from "@/features/repository/Team/Team.repository";
 import { TeamSchema } from "./Team.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace TeamService {
   export async function create(
-    team: Omit<typeof TeamSchema, "id">
+    team: Omit<typeof TeamSchema, "id" | "createdAt" | "updatedAt">
   ) {
-    if (!team.name || team.name.trim() === '') {
-      throw new Error('Team name is required and cannot be empty.');
+    if (!team.name || team.name.trim() === "") {
+      throw new Error("Team name is required and cannot be empty.");
     }
     try {
       const newTeam = TeamRepository.create(team);
@@ -66,7 +66,7 @@ export namespace TeamService {
 
   export async function update(
     teamId: string,
-    data: Partial<Omit<typeof TeamSchema, "id">>
+    data: Partial<Omit<typeof TeamSchema, "id" | "createdAt" | "updatedAt">>
   ) {
     try {
       return await TeamRepository.update(teamId, data);
