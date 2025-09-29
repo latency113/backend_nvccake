@@ -4,6 +4,8 @@ export const TeamSchema = t.Object({
   id: t.String(),
   name: t.String(),
   classroom_id: t.String(),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
 });
 
 export type Team = typeof TeamSchema.static;
@@ -21,8 +23,10 @@ export const TeamWithRelationsSchema = t.Composite([
   TeamSchema,
   t.Object({
     classroom: ClassroomReferenceSchema,
-    orders: t.Array(t.Object({
-      id: t.String(),
-    })),
+    orders: t.Array(
+      t.Object({
+        id: t.String(),
+      })
+    ),
   }),
 ]);
