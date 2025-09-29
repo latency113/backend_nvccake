@@ -14,7 +14,7 @@ const app = new Elysia()
     })
   )
   .use(corsMiddleware)
-  .listen(process.env.PORT ?? 3000);
+  .listen({port:process.env.PORT ?? 3000, hostname: "0.0.0.0"});
 
 console.log(
   `🦊 Elysia is running at http://${app.server?.hostname}:${app.server?.port}/docs`
