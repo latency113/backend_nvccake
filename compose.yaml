@@ -1,3 +1,4 @@
+
 services:
   app:
     build:
@@ -6,23 +7,22 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL="mongodb+srv://loprommy55:1234@khan.hoqrd.mongodb.net/nvc_cake"
-      - JWT_SECRET="euwQ5uyxfIdf02Zh7BE"
-      - PORT=3001
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: ${PORT}
     networks:
       - caddy
+
   app-migrate-deploy:
     build:
-      context: .  
+      context: .
       dockerfile: Dockerfile
       target: builder
     command: bun x prisma migrate deploy
-    ports:
-      - "3000:3000"
     environment:
-      - DATABASE_URL="mongodb+srv://loprommy55:1234@khan.hoqrd.mongodb.net/nvc_cake"
-      - JWT_SECRET="euwQ5uyxfIdf02Zh7BE"
-      - PORT=3001
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: ${PORT}
     networks:
       - caddy
 

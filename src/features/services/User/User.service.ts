@@ -2,6 +2,7 @@ import { UserRepository } from "@/features/repository/User/user.repository";
 import { UserSchema } from "./User.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { TokenService } from "../Token/Token.service";
 
 type JWTInstance = {
   sign: (payload: Record<string, unknown>) => Promise<string>;
@@ -127,9 +128,26 @@ export namespace UserService {
     const payload = {
       role: user.role,
       username: user.username,
+      sub: user.id // ใส่ user id เข้าไปใน token payload
     }
 
-    const token = await jwt.sign(payload)
-    return {token, user};
+    // สร้าง JWT token
+    const jwtToken = await jwt.sign(payload);
+
+    // สร้าง token ในฐานข้อมูล
+    const dbToken = await TokenService.generateToken(user.id);
+
+    return {
+      access_token: jwtToken,
+      refresh_token: dbToken.token,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email
+      }
+    };
   }
 }
