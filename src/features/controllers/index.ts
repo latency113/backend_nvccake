@@ -1,15 +1,15 @@
 import { Elysia } from "elysia";
 
-import { UserController } from "./User/User.controller";
-import { DepartmentController } from "./Department/Department.controller";
-import { TeacherController } from "./Teacher/Teacher.controller";
-import { GradeLevelController } from "./GradeLevel/GradeLevel.controller";
-import { ClassroomController } from "./Classroom/Classroom.controller";
-import { TeamController } from "./Team/Team.controller";
-import { ProductController } from "./Product/Product.controller";
-import { OrderController } from "./Order/Order.controller";
-import { OrderItemController } from "./OrderItem/OrderItem.controller";
-import { AuthController } from "./auth/auth.controllers";
+import { UserController } from "@/features/controllers/User/User.controller";
+import { DepartmentController } from "@/features/controllers/Department/Department.controller";
+import { TeacherController } from "@/features/controllers/Teacher/Teacher.controller";
+import { GradeLevelController } from "@/features/controllers/GradeLevel/GradeLevel.controller";
+import { ClassroomController } from "@/features/controllers/Classroom/Classroom.controller";
+import { TeamController } from "@/features/controllers/Team/Team.controller";
+import { ProductController } from "@/features/controllers/Product/Product.controller";
+import { OrderController } from "@/features/controllers/Order/Order.controller";
+import { OrderItemController } from "@/features/controllers/OrderItem/OrderItem.controller";
+import { AuthController } from "@/features/controllers/auth/auth.controllers";
 
 export const app = new Elysia().group("/api/v1", (app) => {
   app.use(AuthController.authController)
