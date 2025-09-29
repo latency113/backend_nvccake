@@ -3,7 +3,7 @@ import { ClassroomSchema, ClassroomWithAllRelationsSchema } from "../../services
 import { ClassroomService } from "../../services/Classroom/Classroom.service";
 
 export namespace ClassroomController {
-  export const classroomController = new Elysia({ prefix: "/Classrooms" })
+  export const classroomController = new Elysia({ prefix: "/classrooms" })
     .post(
       "/",
       async ({ body, set }) => {

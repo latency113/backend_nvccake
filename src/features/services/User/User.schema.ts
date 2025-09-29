@@ -8,6 +8,8 @@ export const UserSchema = t.Object({
     email: t.Optional(t.String()),
     password: t.String(),
     role: t.UnionEnum(["USER", "ADMIN","OFFICER","SUPERADMIN"]),
+    createdAt:t.Date(),
+    updatedAt:t.Date()
 })
 
 export type User = typeof UserSchema.static
