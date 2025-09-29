@@ -47,11 +47,11 @@ model Department {
 }
 
 model Classroom {
-  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
   name           String
-  teacher_id     String @db.ObjectId
-  department_id  String @db.ObjectId
-  grade_level_id String @db.ObjectId
+  teacher_id     String   @db.ObjectId
+  department_id  String   @db.ObjectId
+  grade_level_id String   @db.ObjectId
   createAt       DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -95,7 +95,7 @@ model Team {
   name         String
   classroom_id String @db.ObjectId
 
-  createAt  DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   classroom Classroom @relation(fields: [classroom_id], references: [id])
@@ -107,7 +107,7 @@ model Product {
   name  String
   price Float
 
-  createAt  DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   orderItems OrderItem[]
@@ -187,7 +187,7 @@ model CakeRequestItems {
 model Teacher {
   id        String      @id @default(auto()) @map("_id") @db.ObjectId
   name      String
-  createAt  DateTime    @default(now())
+  createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   classroom Classroom[]
 }
