@@ -21,13 +21,16 @@ export namespace ClassroomRepository {
     }
 
     if (!department) {
-      throw new Error(`Department with id ${Classroom.department_id} not found`);
+      throw new Error(
+        `Department with id ${Classroom.department_id} not found`
+      );
     }
 
     return prisma.classroom.create({
       data: {
         ...Classroom,
-    }})
+      },
+    });
   }
 
   export async function findAll(options: {
@@ -61,7 +64,7 @@ export namespace ClassroomRepository {
     Classroom: Partial<
       Pick<
         typeof ClassroomSchema,
-        "teacher_id" | "department_id" | "gradeLevel_id"
+        "name" | "teacher_id" | "department_id" | "gradeLevel_id"
       >
     >
   ) {
