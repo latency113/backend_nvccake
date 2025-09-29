@@ -24,7 +24,7 @@ export namespace TeamController {
         }
       },
       {
-        body: t.Omit(TeamSchema, ["id"]),
+        body: t.Omit(TeamSchema, ["id", "createdAt", "updatedAt"]),
         response: {
           201: t.Object({
             newTeam: TeamSchema,
@@ -136,7 +136,7 @@ export namespace TeamController {
         params: t.Object({
           teamId: t.String(),
         }),
-        body: t.Partial(t.Omit(TeamSchema, ["id"])),
+        body: t.Partial(t.Omit(TeamSchema, ["id", "createdAt", "updatedAt"])),
         response: {
           200: t.Object({
             updatedTeam: TeamSchema,
