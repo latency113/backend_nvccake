@@ -3,7 +3,7 @@ import { TeacherSchema } from "@/features/services/Teacher/Teacher.schema";
 
 export namespace TeacherRepository {
   export async function create(
-    teacher: Pick<typeof TeacherSchema, "name">
+    teacher: Pick<typeof TeacherSchema, "name" | "department_id">
   ) {
     return prisma.teacher.create({
       data: {
@@ -67,7 +67,7 @@ export namespace TeacherRepository {
 
   export async function update(
     teacherId: string,
-    teacher: Partial<Pick<typeof TeacherSchema, "name">>
+    teacher: Partial<Pick<typeof TeacherSchema, "name" | "department_id">>
   ) {
     return prisma.teacher.update({
       where: {

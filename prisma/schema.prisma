@@ -44,6 +44,7 @@ model Department {
 
   classroom   Classroom[]
   cakeRequest CakeRequest[]
+  teacher     Teacher[]
 }
 
 model Classroom {
@@ -52,7 +53,7 @@ model Classroom {
   teacher_id     String   @db.ObjectId
   department_id  String   @db.ObjectId
   grade_level_id String   @db.ObjectId
-  createAt       DateTime @default(now())
+  createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   teacher     Teacher     @relation(fields: [teacher_id], references: [id])
@@ -185,11 +186,13 @@ model CakeRequestItems {
 }
 
 model Teacher {
-  id        String      @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  classroom Classroom[]
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  department_id String      @db.ObjectId
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  classroom     Classroom[]
+  department    Department  @relation(fields: [department_id], references: [id])
 }
 
 model Token {

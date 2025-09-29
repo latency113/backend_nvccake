@@ -16,7 +16,7 @@ export type Classroom = typeof ClassroomSchema.static;
 const TeacherWithClassroomsSchema = t.Object({
   id: t.String(),
   name: t.String(),
-  classroom: t.Array(ClassroomSchema),
+  department_id: t.String(),
 });
 
 export const ClassroomWithAllRelationsSchema = t.Composite([
