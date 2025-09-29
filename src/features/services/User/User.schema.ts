@@ -5,7 +5,7 @@ export const UserSchema = t.Object({
     firstname: t.String(),
     lastname: t.String(),
     username: t.String(),
-    email: t.String(),
+    email: t.Optional(t.String()),
     password: t.String(),
     role: t.UnionEnum(["USER", "ADMIN","OFFICER","SUPERADMIN"]),
 })
