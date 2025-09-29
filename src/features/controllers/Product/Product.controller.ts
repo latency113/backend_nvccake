@@ -28,7 +28,7 @@ export namespace ProductController {
         }
       },
       {
-        body: t.Omit(ProductSchema, ["id"]),
+        body: t.Omit(ProductSchema, ["id", "createdAt", "updatedAt"]),
         response: {
           201: t.Object({
             newProduct: ProductSchema,

@@ -24,7 +24,7 @@ export namespace TeacherController {
         }
       },
       {
-        body: t.Omit(TeacherSchema, ["id"]),
+        body: t.Omit(TeacherSchema, ["id", "createdAt", "updatedAt"]),
         response: {
           201: t.Object({
             newTeacher: TeacherSchema,
@@ -123,7 +123,7 @@ export namespace TeacherController {
         }
       },
       {
-        body: t.Partial(t.Omit(TeacherSchema, ["id"])),
+        body: t.Partial(t.Omit(TeacherSchema, ["id", "createdAt", "updatedAt"])),
         params: t.Object({
           TeacherId: t.String(),
         }),
