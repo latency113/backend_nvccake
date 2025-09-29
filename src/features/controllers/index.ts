@@ -9,8 +9,10 @@ import { TeamController } from "./Team/Team.controller";
 import { ProductController } from "./Product/Product.controller";
 import { OrderController } from "./Order/Order.controller";
 import { OrderItemController } from "./OrderItem/OrderItem.controller";
+import { AuthController } from "./auth/auth.controllers";
 
 export const app = new Elysia().group("/api/v1", (app) => {
+  app.use(AuthController.authController)
   app.use(UserController.userController);
   app.use(DepartmentController.departmentController);
   app.use(TeacherController.teacherController);

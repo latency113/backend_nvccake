@@ -1,7 +1,11 @@
-import { UserRepository } from "@/features/repository/User/User.repository";
+import { UserRepository } from "@/features/repository/User/user.repository";
 import { UserSchema } from "./User.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+
+type JWTInstance = {
+  sign: (payload: Record<string, unknown>) => Promise<string>;
+};
 
 export namespace UserService {
   export async function create(
@@ -21,11 +25,15 @@ export namespace UserService {
     }
     try {
       const hashPassword = await Bun.password.hash(user.password);
-      return await UserRepository.create({
-        ...user,
+      const newUser = await UserRepository.create({
+        firstname: user.firstname,
+        lastname: user.lastname,
+        username: user.username,
+        email: user.email,
         password: hashPassword,
       });
-    } catch (error: any) {
+      return newUser;
+    } catch (error) {
       if (
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
@@ -84,7 +92,7 @@ export namespace UserService {
         data.password = await Bun.password.hash(user.password);
       }
       return await UserRepository.update(userId, data);
-    } catch (error: any) {
+    } catch (error) {
       if (
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
@@ -97,5 +105,31 @@ export namespace UserService {
 
   export async function deleteById(userId: string) {
     return UserRepository.deleteById(userId);
+  }
+
+  export async function login(username: string, password: string, jwt: JWTInstance) {
+    const user = await UserRepository.findUserByUsername(username);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    let isPasswordValid = false;
+    try {
+      isPasswordValid = await Bun.password.verify(password, user.password);
+    } catch (_error) {
+      throw new Error("Invalid password");
+    }
+
+    if (!isPasswordValid) {
+      throw new Error("Invalid password");
+    }
+
+    const payload = {
+      role: user.role,
+      username: user.username,
+    }
+
+    const token = await jwt.sign(payload)
+    return {token, user};
   }
 }

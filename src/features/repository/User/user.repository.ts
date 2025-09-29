@@ -36,6 +36,14 @@ export namespace UserRepository {
     });
   }
 
+  export async function findUserByUsername(username: string) {
+    return await prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+    });
+  }
+
   export async function findById(userId: string) {
     return await prisma.user.findUnique({
       where: {

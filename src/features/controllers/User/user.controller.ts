@@ -1,6 +1,7 @@
 import Elysia, { t } from "elysia";
 import { UserSchema } from "../../services/User/User.schema";
 import { UserService } from "../../services/User/User.service";
+import jwt from "@elysiajs/jwt";
 
 export namespace UserController {
   export const userController = new Elysia({ prefix: "/users" })
