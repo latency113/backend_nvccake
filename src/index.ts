@@ -2,9 +2,11 @@ import swagger from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 import { corsMiddleware } from "./shared/middleware/cors";
 import { app as mainApp } from "./features/controllers";
+import cors from "@elysiajs/cors";
 
 const app = new Elysia()
   .use(mainApp)
+  .use(cors())
   .use(swagger({ path: "/docs" }))
   .use(corsMiddleware)
   .listen(process.env.PORT ?? 3000);
