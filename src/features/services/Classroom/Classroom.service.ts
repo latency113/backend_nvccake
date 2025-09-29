@@ -5,7 +5,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace ClassroomService {
   export async function create(
-    Classroom: Omit<typeof ClassroomSchema, "id">
+    Classroom: Omit<typeof ClassroomSchema, "id"| "createdAt" | "updatedAt">
   ) {
     if (!Classroom.name || Classroom.name.trim() === '') {
       throw new Error('Classroom name is required and cannot be empty.');

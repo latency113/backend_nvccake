@@ -5,7 +5,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace ProductService {
   export async function create(
-    product: Omit<typeof ProductSchema, "id">
+    product: Omit<typeof ProductSchema, "id"| "createdAt" | "updatedAt">
   ) {
     if (!product.name || product.name.trim() === '') {
       throw new Error('Product name is required and cannot be empty.');
@@ -69,7 +69,7 @@ export namespace ProductService {
 
   export async function update(
     productId: string,
-    data: Partial<Omit<typeof ProductSchema, "id">>
+    data: Partial<Omit<typeof ProductSchema, "id"| "createdAt" | "updatedAt">>
   ) {
     if (data.price !== undefined && data.price < 0) {
       throw new Error('Product price cannot be negative.');
