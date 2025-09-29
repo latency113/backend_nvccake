@@ -3,7 +3,7 @@ import { GradeLevelSchema, GradeLevelWithRelationsSchema } from "../../services/
 import { GradeLevelService } from "../../services/GradeLevel/GradeLevel.service";
 
 export namespace GradeLevelController {
-  export const gradeLevelController = new Elysia({ prefix: "/GradeLevels" })
+  export const gradeLevelController = new Elysia({ prefix: "/grade-levels" })
     .post(
       "/",
       async ({ body, set }) => {
