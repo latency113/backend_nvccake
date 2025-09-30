@@ -6,7 +6,7 @@ import cors from "@elysiajs/cors";
 
 const app = new Elysia()
   .use(mainApp)
-  .use(cors())
+  .use(cors({methods: ["GET", "POST", "PUT", "DELETE","PATCH"], origin: "*"}))
   .use(swagger({ path: "/docs" }))
   .use(corsMiddleware)
   .listen(process.env.PORT ?? 3000);

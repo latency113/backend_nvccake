@@ -10,15 +10,22 @@ export namespace DepartmentService {
     if (!Department.name || Department.name.trim() === '') {
       throw new Error('Department name is required and cannot be empty.');
     }
+
+    const existingDepartment = await DepartmentRepository.findByName(Department.name);
+    console.log('Existing Department:', existingDepartment);
+    if (existingDepartment) {
+      throw new Error("Department Name already exists");
+    }
+
     try {
-      const newDepartment = DepartmentRepository.create(Department);
+      const newDepartment = await DepartmentRepository.create(Department);
       return newDepartment;
     } catch (error: any) {
       if (
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new Error("Departmentname already exists");
+        throw new Error("Department Name already exists");
       }
       throw error;
     }
@@ -72,7 +79,7 @@ export namespace DepartmentService {
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new Error("Departmentname already exists");
+        throw new Error("Department Name already exists");
       }
       throw error;
     }
