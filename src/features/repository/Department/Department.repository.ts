@@ -29,9 +29,9 @@ export namespace DepartmentRepository {
       where,
       include: {
         classroom: {
-          include: {grade_level: true }
+          include: { grade_level: true },
         },
-        cakeRequest: true
+        teacher: true,
       },
       take: options.take,
       skip: options.skip,
@@ -42,6 +42,12 @@ export namespace DepartmentRepository {
     return await prisma.department.findUnique({
       where: {
         id: departmentId,
+      },
+      include: {
+        classroom: {
+          include: { grade_level: true },
+        },
+        teacher: true,
       },
     });
   }
@@ -56,6 +62,14 @@ export namespace DepartmentRepository {
       },
       data: {
         ...department,
+      },
+    });
+  }
+
+  export async function findByName(name: string) {
+    return prisma.department.findUnique({
+      where: {
+        name: name,
       },
     });
   }

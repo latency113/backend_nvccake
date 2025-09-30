@@ -12,7 +12,7 @@ export namespace DepartmentController {
           set.status = 201;
           return {  newDepartment, message: "Department has created" };
         } catch (error: any) {
-          if (error.message === "Departmentname already exists") {
+          if (error.message === "Department Name already exists") {
             set.status = "Conflict";
             return error.message;
           }
@@ -97,7 +97,7 @@ export namespace DepartmentController {
           DepartmentId: t.String(),
         }),
         response: {
-          200: DepartmentSchema,
+          200: DepartmentWithRelationsSchema,
           500: t.String(),
         },
         tags: ["Departments"],
@@ -111,7 +111,7 @@ export namespace DepartmentController {
           set.status = "OK";
           return {  updateDepartment, message: "Department has updated" };
         } catch (error: any) {
-          if (error.message === "Departmentname already exists") {
+          if (error.message === "Department Name already exists") {
             set.status = "Conflict";
             return error.message;
           }
