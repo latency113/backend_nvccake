@@ -38,17 +38,35 @@ export namespace ClassroomRepository {
     take: number;
     search?: string;
   }) {
-    return prisma.classroom.findMany({
+    const classrooms = await prisma.classroom.findMany({
       include: {
         department: true,
         grade_level: true,
         teacher: true,
-        teams: true,
         orders: true,
       },
       take: options.take,
       skip: options.skip,
     });
+
+    // Manually fetch teams for each classroom
+    const classroomsWithTeams = await Promise.all(
+      classrooms.map(async (classroom) => {
+        const teams = await prisma.team.findMany({
+          where: {
+            classroom_ids: {
+              has: classroom.id
+            }
+          }
+        });
+        return {
+          ...classroom,
+          teams,
+        };
+      })
+    );
+
+    return classroomsWithTeams;
   }
 
   export async function findById(ClassroomId: string) {

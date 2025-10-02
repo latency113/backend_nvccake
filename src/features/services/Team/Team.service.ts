@@ -5,13 +5,19 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace TeamService {
   export async function create(
-    team: Omit<typeof TeamSchema, "id" | "createdAt" | "updatedAt">
+    team: Omit<typeof TeamSchema.static, "id" | "createdAt" | "updatedAt">
   ) {
     if (!team.name || team.name.trim() === "") {
       throw new Error("Team name is required and cannot be empty.");
     }
+    
+    // Validate that at least one classroom is provided
+    if (!team.classroom_ids || team.classroom_ids.length === 0) {
+      throw new Error("At least one classroom is required.");
+    }
+
     try {
-      const newTeam = TeamRepository.create(team);
+      const newTeam = await TeamRepository.create(team);
       return newTeam;
     } catch (error) {
       if (
@@ -66,8 +72,13 @@ export namespace TeamService {
 
   export async function update(
     teamId: string,
-    data: Partial<Omit<typeof TeamSchema, "id" | "createdAt" | "updatedAt">>
+    data: Partial<Omit<typeof TeamSchema.static, "id" | "createdAt" | "updatedAt">>
   ) {
+    // Validate classroom_ids if provided
+    if (data.classroom_ids && data.classroom_ids.length === 0) {
+      throw new Error("At least one classroom is required.");
+    }
+
     try {
       return await TeamRepository.update(teamId, data);
     } catch (error) {
