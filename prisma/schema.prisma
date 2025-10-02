@@ -60,7 +60,6 @@ model Classroom {
   department  Department  @relation(fields: [department_id], references: [id])
   grade_level GradeLevel? @relation(fields: [grade_level_id], references: [id])
 
-  teams  Team[]
   orders Order[]
 
   @@index([department_id], name: "idx_classroom_department_id")
@@ -92,15 +91,14 @@ model User {
 }
 
 model Team {
-  id           String @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  classroom_id String @db.ObjectId
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  classroom_ids String[] @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  classroom Classroom @relation(fields: [classroom_id], references: [id])
-  orders    Order[]
+  orders Order[]
 }
 
 model Product {

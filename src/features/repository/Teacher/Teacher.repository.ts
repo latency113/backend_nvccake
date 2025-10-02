@@ -33,11 +33,6 @@ export namespace TeacherRepository {
             grade_level: true,
             department: true,
             teacher: true,
-            teams: {
-              select: {
-                id: true
-              }
-            },
             orders: {
               select: {
                 id: true
@@ -50,11 +45,35 @@ export namespace TeacherRepository {
       skip: options.skip,
     });
 
-    // Transform each teacher to ensure classroom array is present
-    return teachers.map(teacher => ({
-      ...teacher,
-      classroom: teacher.classroom || [] // Ensure classroom is always an array
-    }));
+    // Manually fetch teams for each classroom
+    const teachersWithTeams = await Promise.all(
+      teachers.map(async (teacher) => {
+        const classroomsWithTeams = await Promise.all(
+          (teacher.classroom || []).map(async (classroom) => {
+            const teams = await prisma.team.findMany({
+              where: {
+                classroom_ids: {
+                  has: classroom.id
+                }
+              },
+              select: {
+                id: true
+              }
+            });
+            return {
+              ...classroom,
+              teams,
+            };
+          })
+        );
+        return {
+          ...teacher,
+          classroom: classroomsWithTeams,
+        };
+      })
+    );
+
+    return teachersWithTeams;
   }
 
   export async function findById(teacherId: string) {

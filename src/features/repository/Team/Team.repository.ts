@@ -3,11 +3,12 @@ import { TeamSchema } from "@/features/services/Team/Team.schema";
 
 export namespace TeamRepository {
   export async function create(
-    team: Pick<typeof TeamSchema, "name" | "classroom_id">
+    team: Pick<typeof TeamSchema, "name" | "classroom_ids">
   ) {
     return prisma.team.create({
       data: {
-        ...team,
+        name: team.name,
+        classroom_ids: team.classroom_ids,
       },
     });
   }
@@ -25,10 +26,9 @@ export namespace TeamRepository {
         }
       : {};
 
-    return prisma.team.findMany({
+    const teams = await prisma.team.findMany({
       where,
       include: {
-        classroom: true,
         orders: {
           select: {
             id: true
@@ -38,29 +38,99 @@ export namespace TeamRepository {
       take: options.take,
       skip: options.skip,
     });
+
+    // Manually fetch related data
+    const teamsWithRelations = await Promise.all(
+      teams.map(async (team) => {
+        const classrooms = await prisma.classroom.findMany({
+          where: { id: { in: team.classroom_ids } },
+          include: {
+            department: true,
+            grade_level: true,
+          }
+        });
+
+        // Extract unique departments and grade levels from classrooms
+        const departmentMap = new Map();
+        const gradeLevelMap = new Map();
+        
+        classrooms.forEach(classroom => {
+          if (classroom.department) {
+            departmentMap.set(classroom.department.id, classroom.department);
+          }
+          if (classroom.grade_level) {
+            gradeLevelMap.set(classroom.grade_level.id, classroom.grade_level);
+          }
+        });
+
+        return {
+          ...team,
+          classrooms,
+          departments: Array.from(departmentMap.values()),
+          gradeLevels: Array.from(gradeLevelMap.values()),
+        };
+      })
+    );
+
+    return teamsWithRelations;
   }
 
   export async function findById(teamId: string) {
-    return await prisma.team.findUnique({
+    const team = await prisma.team.findUnique({
       where: {
         id: teamId,
       },
       include: {
-        classroom: true,
         orders: true
       },
     });
+
+    if (!team) {
+      return null;
+    }
+
+    // Manually fetch related data
+    const classrooms = await prisma.classroom.findMany({
+      where: { id: { in: team.classroom_ids } },
+      include: {
+        department: true,
+        grade_level: true,
+      }
+    });
+
+    // Extract unique departments and grade levels from classrooms
+    const departmentMap = new Map();
+    const gradeLevelMap = new Map();
+    
+    classrooms.forEach(classroom => {
+      if (classroom.department) {
+        departmentMap.set(classroom.department.id, classroom.department);
+      }
+      if (classroom.grade_level) {
+        gradeLevelMap.set(classroom.grade_level.id, classroom.grade_level);
+      }
+    });
+
+    return {
+      ...team,
+      classrooms,
+      departments: Array.from(departmentMap.values()),
+      gradeLevels: Array.from(gradeLevelMap.values()),
+    };
   }
 
   export async function update(
     teamId: string,
-    team: Partial<Pick<typeof TeamSchema, "name" | "classroom_id">>
+    team: Partial<Pick<typeof TeamSchema, "name" | "classroom_ids">>
   ) {
     return await prisma.team.update({
       where: {
         id: teamId,
       },
-      data: team,
+      data: {
+        ...(team.name !== undefined && { name: team.name }),
+        ...(team.classroom_ids !== undefined && { classroom_ids: team.classroom_ids }),
+      },
     });
   }
 
