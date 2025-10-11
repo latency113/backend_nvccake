@@ -1,14 +1,93 @@
-import { ClassroomRepository } from "@/features/repository/Classroom/Classroom.repository"
-import { CreateClassroomDto, ClassroomSchema, UpdateClassroomDto } from "./Classroom.schema";
+import { ClassroomRepository } from "@/features/repository/Classroom/Classroom.repository";
+import { CreateClassroomDto, UpdateClassroomDto } from "./Classroom.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import * as XLSX from "xlsx";
 
 export namespace ClassroomService {
-  export async function create(
-    Classroom: CreateClassroomDto
+  export async function uploadStudentsFromExcel(
+    classroomId: string,
+    file: File
   ) {
-    if (!Classroom.name || Classroom.name.trim() === '') {
-      throw new Error('Classroom name is required and cannot be empty.');
+    const arrayBuffer = await file.arrayBuffer();
+    const workbook = XLSX.read(arrayBuffer, { type: "array" });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    const students = [];
+
+    for (let i = 10; i < data.length; i++) {
+      // เริ่มจากแถว 11 (index 10)
+      const row = data[i];
+      const studentId = row[2] || "";
+      const fullName = row[3] || "";
+
+      if (studentId && fullName) {
+        students.push({ studentId, fullName });
+      }
+    }
+
+    // Fetch the existing classroom
+    const existingClassroom = await ClassroomRepository.findById(classroomId);
+    if (!existingClassroom) {
+      throw new Error(`Classroom with ID ${classroomId} not found.`);
+    }
+
+    // Update the students field. Prisma's Json type expects a plain object or array.
+    // Ensure the students array is stored correctly.
+    const updatedClassroom = await ClassroomRepository.update(
+      classroomId,
+      { students: students as any } // Cast to any because Prisma's Json type can be tricky with direct array assignment
+    );
+
+    return updatedClassroom;
+  }
+
+  export async function getStudentsWithCakePounds(classroomId: string) {
+    const classroom = await ClassroomRepository.findById(classroomId);
+
+    if (!classroom) {
+      throw new Error(`Classroom with ID ${classroomId} not found.`);
+    }
+
+    const studentsData: {
+      number: string;
+      name: string;
+      totalPounds: number;
+    }[] = [];
+    let totalPoundsForClassroom = 0;
+
+    // Assuming classroom.students is an array of { number: string, name: string }
+    const studentsInClassroom = classroom.students as {
+      number: string;
+      name: string;
+    }[];
+
+    for (const student of studentsInClassroom) {
+      let studentTotalPounds = 0;
+
+      for (const order of classroom.orders) {
+        // Assumption: Order.customerName matches student.name
+        if (order.customerName === student.name) {
+          for (const orderItem of order.order_items) {
+            studentTotalPounds += orderItem.pound;
+          }
+        }
+      }
+      studentsData.push({ ...student, totalPounds: studentTotalPounds });
+      totalPoundsForClassroom += studentTotalPounds;
+    }
+
+    return {
+      students: studentsData,
+      totalPoundsForClassroom,
+    };
+  }
+
+  export async function create(Classroom: CreateClassroomDto) {
+    if (!Classroom.name || Classroom.name.trim() === "") {
+      throw new Error("Classroom name is required and cannot be empty.");
     }
     try {
       const newClassroom = ClassroomRepository.create(Classroom);

@@ -71,7 +71,11 @@ export namespace ClassroomRepository {
         department: true,
         grade_level: true,
         teacher: true,
-        orders: true,
+        orders: {
+          include: {
+            order_items: true,
+          },
+        },
       },
     });
   }

@@ -130,7 +130,7 @@ export namespace UserService {
     const jwtToken = await jwt.sign(payload);
 
     // สร้าง token ในฐานข้อมูล
-    const dbToken = await TokenService.generateToken(user.id);
+    const dbToken = await TokenService.generateToken({ user_id: user.id });
 
     return {
       access_token: jwtToken,

@@ -19,13 +19,16 @@ export namespace TeamRepository {
     take: number;
     search?: string;
   }) {
-    const where = options.search
-      ? {
-          name: {
-            contains: options.search,
-          },
-        }
-      : {};
+    const where = {
+      ...(options.search && {
+        name: {
+          contains: options.search,
+        },
+      }),
+      team_type: {
+        in: ["team", "person"], // Ensure team_type is a valid enum value
+      },
+    };
 
     const teams = await prisma.team.findMany({
       where,

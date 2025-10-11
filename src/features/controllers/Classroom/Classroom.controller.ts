@@ -4,6 +4,55 @@ import { ClassroomService } from "../../services/Classroom/Classroom.service";
 
 export namespace ClassroomController {
   export const classroomController = new Elysia({ prefix: "/classrooms" })
+        .post(
+      "/:ClassroomId/upload-students",
+      async ({ params, body, set }) => {
+        try {
+          const { ClassroomId } = params;
+          const { file } = body;
+
+          if (!file) {
+            set.status = "Bad Request";
+            return "No file uploaded.";
+          }
+
+          const updatedClassroom = await ClassroomService.uploadStudentsFromExcel(
+            ClassroomId,
+            file
+          );
+
+          set.status = "OK";
+          return {
+            updatedClassroom,
+            message: "Students uploaded and classroom updated successfully.",
+          };
+        } catch (error: any) {
+          set.status = "Internal Server Error";
+          if ("message" in error) {
+            return error.message;
+          }
+          return "Internal Server Error";
+        }
+      },
+      {
+        params: t.Object({
+          ClassroomId: t.String(),
+        }),
+        body: t.Object({
+          file: t.File(),
+        }),
+        type: "formdata",
+        response: {
+          200: t.Object({
+            updatedClassroom: ClassroomSchema,
+            message: t.String(),
+          }),
+          400: t.String(),
+          500: t.String(),
+        },
+        tags: ["Classrooms"],
+      }
+    )
     .post(
       "/",
       async ({ body, set }) => {
@@ -80,6 +129,40 @@ export namespace ClassroomController {
           }),
           404: t.Object({
             message: t.String(),
+          }),
+          500: t.String(),
+        },
+        tags: ["Classrooms"],
+      }
+    )
+    .get(
+      "/:ClassroomId/students-with-cake-pounds",
+      async ({ params, set }) => {
+        try {
+          const { ClassroomId } = params;
+          const result = await ClassroomService.getStudentsWithCakePounds(ClassroomId);
+          set.status = "OK";
+          return result;
+        } catch (error: any) {
+          set.status = "Internal Server Error";
+          if ("message" in error) {
+            return error.message;
+          }
+          return "Internal Server Error";
+        }
+      },
+      {
+        params: t.Object({
+          ClassroomId: t.String(),
+        }),
+        response: {
+          200: t.Object({
+            students: t.Array(t.Object({
+              number: t.String(),
+              name: t.String(),
+              totalPounds: t.Number(),
+            })),
+            totalPoundsForClassroom: t.Number(),
           }),
           500: t.String(),
         },

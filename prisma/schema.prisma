@@ -58,7 +58,7 @@ model Classroom {
   teacher_id     String   @db.ObjectId
   department_id  String   @db.ObjectId
   grade_level_id String   @db.ObjectId
-  students       Json
+  students       Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
