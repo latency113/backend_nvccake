@@ -1,9 +1,9 @@
 import Elysia, { t } from "elysia";
-import { GradeLevelSchema, GradeLevelWithRelationsSchema } from "../../services/GradeLevel/GradeLevel.schema";
+import { CreateGradeLevelDto, GradeLevelSchema, GradeLevelWithRelationsSchema, UpdateGradeLevelDto } from "../../services/GradeLevel/GradeLevel.schema";
 import { GradeLevelService } from "../../services/GradeLevel/GradeLevel.service";
 
 export namespace GradeLevelController {
-  export const gradeLevelController = new Elysia({ prefix: "/GradeLevels" })
+  export const gradeLevelController = new Elysia({ prefix: "/grade-levels" })
     .post(
       "/",
       async ({ body, set }) => {
@@ -12,7 +12,7 @@ export namespace GradeLevelController {
           set.status = 201;
           return {  newGradeLevel, message: "GradeLevel has created" };
         } catch (error: any) {
-          if (error.message === "GradeLevelname already exists") {
+          if (error.message === "Duplicate GradeLevel (level, year) combination") {
             set.status = "Conflict";
             return error.message;
           }
@@ -24,7 +24,7 @@ export namespace GradeLevelController {
         }
       },
       {
-        body: t.Omit(GradeLevelSchema, ["id"]),
+        body: CreateGradeLevelDto,
         response: {
           201: t.Object({
             newGradeLevel: GradeLevelSchema,
@@ -97,7 +97,7 @@ export namespace GradeLevelController {
           GradeLevelId: t.String(),
         }),
         response: {
-          200: GradeLevelSchema,
+          200: GradeLevelWithRelationsSchema,
           500: t.String(),
         },
         tags: ["GradeLevels"],
@@ -111,7 +111,7 @@ export namespace GradeLevelController {
           set.status = "OK";
           return {  updateGradeLevel, message: "GradeLevel has updated" };
         } catch (error: any) {
-          if (error.message === "GradeLevelname already exists") {
+          if (error.message === "Duplicate GradeLevel (level, year) combination") {
             set.status = "Conflict";
             return error.message;
           }
@@ -123,7 +123,7 @@ export namespace GradeLevelController {
         }
       },
       {
-        body: t.Partial(t.Omit(GradeLevelSchema, ["id"])),
+        body: UpdateGradeLevelDto,
         params: t.Object({
           GradeLevelId: t.String(),
         }),

@@ -1,11 +1,11 @@
-import { ClassroomRepository } from "@/features/repository/Classroom/Classrom.repository"
-import { ClassroomSchema } from "./Classroom.schema";
+import { ClassroomRepository } from "@/features/repository/Classroom/Classroom.repository"
+import { CreateClassroomDto, ClassroomSchema, UpdateClassroomDto } from "./Classroom.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace ClassroomService {
   export async function create(
-    Classroom: Omit<typeof ClassroomSchema, "id">
+    Classroom: CreateClassroomDto
   ) {
     if (!Classroom.name || Classroom.name.trim() === '') {
       throw new Error('Classroom name is required and cannot be empty.');
@@ -43,17 +43,8 @@ export namespace ClassroomService {
     const nextPage = page < totalPages;
     const previousPage = page > 1;
 
-    // Transform the data to ensure teacher has a classroom array
-    const transformedClassrooms = Classrooms.map(classroom => ({
-      ...classroom,
-      teacher: {
-        ...classroom.teacher,
-        classroom: [classroom]  // Add this classroom to the teacher's classroom array
-      }
-    }));
-
     return {
-      data: transformedClassrooms,
+      data: Classrooms,
       meta_data: {
         page,
         itemsPerPage,
@@ -71,7 +62,7 @@ export namespace ClassroomService {
 
   export async function update(
     ClassroomId: string,
-    Classroom: Partial<Pick<typeof ClassroomSchema, "name">>
+    Classroom: UpdateClassroomDto
   ) {
     try {
       const data = { ...Classroom };
@@ -81,7 +72,7 @@ export namespace ClassroomService {
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new Error("Classroomname already exists");
+        throw new Error("Classroom name already exists");
       }
       throw error;
     }

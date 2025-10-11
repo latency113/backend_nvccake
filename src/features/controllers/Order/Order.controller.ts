@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import { OrderSchema, OrderWithRelationsSchema } from "../../services/Order/Order.schema";
+import { CreateOrderDto, OrderSchema, OrderWithRelationsSchema, UpdateOrderDto } from "../../services/Order/Order.schema";
 import { OrderService } from "../../services/Order/Order.service";
 
 export namespace OrderController {
@@ -27,7 +27,7 @@ export namespace OrderController {
         }
       },
       {
-        body: t.Omit(OrderSchema, ["id", "createdAt", "updatedAt"]),
+        body: CreateOrderDto,
         response: {
           201: t.Object({
             newOrder: OrderSchema,
@@ -148,7 +148,7 @@ export namespace OrderController {
         params: t.Object({
           orderId: t.String(),
         }),
-        body: t.Partial(t.Omit(OrderSchema, ["id", "createdAt", "updatedAt"])),
+        body: UpdateOrderDto,
         response: {
           200: t.Object({
             updatedOrder: OrderSchema,

@@ -4,9 +4,22 @@ export const ProductSchema = t.Object({
   id: t.String(),
   name: t.String(),
   price: t.Number(),
+  description: t.Optional(t.String()),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
 });
 
 export type Product = typeof ProductSchema.static;
+
+export const CreateProductDto = t.Object({
+  name: t.String(),
+  price: t.Number(),
+  description: t.Optional(t.String()),
+});
+export type CreateProductDto = typeof CreateProductDto.static;
+
+export const UpdateProductDto = t.Partial(CreateProductDto);
+export type UpdateProductDto = typeof UpdateProductDto.static;
 
 // Define OrderItem reference schema
 const OrderItemReferenceSchema = t.Object({

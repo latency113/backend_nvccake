@@ -1,5 +1,6 @@
 import Elysia, { t } from "elysia";
 import { TokenService } from "../../services/Token/Token.service";
+import { CreateTokenDto, VerifyTokenDto } from "@/features/services/Token/Token.schema";
 
 export namespace TokenController {
   export const tokenController = new Elysia({ prefix: "/tokens" })
@@ -7,8 +8,7 @@ export namespace TokenController {
       "/generate",
       async ({ body, set }) => {
         try {
-          const { userId, expiresIn } = body;
-          const token = await TokenService.generateToken(userId, expiresIn);
+          const token = await TokenService.generateToken(body);
           set.status = 201;
           return token;
         } catch (error: any) {
@@ -17,18 +17,15 @@ export namespace TokenController {
         }
       },
       {
-        body: t.Object({
-          userId: t.String(),
-          expiresIn: t.Optional(t.Number()),
-        }),
+        body: CreateTokenDto,
         tags: ["Token"],
       }
     )
     .get(
       "/verify/:token",
-      async ({ params: { token }, set }) => {
+      async ({ params, set }) => {
         try {
-          const tokenRecord = await TokenService.verifyToken(token);
+          const tokenRecord = await TokenService.verifyToken(params);
           if (!tokenRecord) {
             set.status = "Not Found";
             return { error: "Token not found or expired" };
@@ -40,7 +37,7 @@ export namespace TokenController {
         }
       },
       {
-        tags: ["Token"],
+        params: VerifyTokenDto,
       }
     )
     .get(
@@ -59,9 +56,9 @@ export namespace TokenController {
     )
     .delete(
       "/:token",
-      async ({ params: { token }, set }) => {
+      async ({ params, set }) => {
         try {
-          await TokenService.revokeToken(token);
+          await TokenService.revokeToken(params);
           set.status = 204;
           return null;
         } catch (error: any) {
@@ -70,7 +67,7 @@ export namespace TokenController {
         }
       },
       {
-        tags: ["Token"],
+        params: VerifyTokenDto,
       }
     )
     .delete(

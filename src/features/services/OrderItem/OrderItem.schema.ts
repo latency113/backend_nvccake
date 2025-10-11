@@ -25,7 +25,17 @@ const ProductReferenceSchema = t.Object({
 const OrderReferenceSchema = t.Object({
   id: t.String(),
   customerName: t.String(),
+  classroom_id: t.Optional(t.String()),
+  team_id: t.Optional(t.Nullable(t.String())),
+  orderDate: t.Date(),
   totalPrice: t.Number(),
+  book_number: t.Number(),
+  number: t.Number(),
+  phone: t.String(),
+  pickup_date: t.Date(),
+  deposit: t.Number(),
+  advisor: t.String(),
+  status: t.UnionEnum(["pending", "complete", "cancelled"]),
 });
 
 export const OrderItemWithRelationsSchema = t.Composite([

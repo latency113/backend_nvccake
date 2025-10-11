@@ -1,17 +1,23 @@
-import { TeamRepository } from "@/features/repository/Team/Team.repository"
-import { TeamSchema } from "./Team.schema";
+import { TeamRepository } from "@/features/repository/Team/Team.repository";
+import { CreateTeamDto, TeamSchema, UpdateTeamDto } from "./Team.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace TeamService {
   export async function create(
-    team: Omit<typeof TeamSchema, "id">
+    team: CreateTeamDto
   ) {
-    if (!team.name || team.name.trim() === '') {
-      throw new Error('Team name is required and cannot be empty.');
+    if (!team.name || team.name.trim() === "") {
+      throw new Error("Team name is required and cannot be empty.");
     }
+    
+    // Validate that at least one classroom is provided
+    if (!team.classroom_ids || team.classroom_ids.length === 0) {
+      throw new Error("At least one classroom is required.");
+    }
+
     try {
-      const newTeam = TeamRepository.create(team);
+      const newTeam = await TeamRepository.create(team);
       return newTeam;
     } catch (error) {
       if (
@@ -66,8 +72,13 @@ export namespace TeamService {
 
   export async function update(
     teamId: string,
-    data: Partial<Omit<typeof TeamSchema, "id">>
+    data: UpdateTeamDto
   ) {
+    // Validate classroom_ids if provided
+    if (data.classroom_ids && data.classroom_ids.length === 0) {
+      throw new Error("At least one classroom is required.");
+    }
+
     try {
       return await TeamRepository.update(teamId, data);
     } catch (error) {

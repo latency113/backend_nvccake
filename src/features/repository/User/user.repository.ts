@@ -1,12 +1,9 @@
 import prisma from "@/providers/database/database.provider";
-import { UserSchema } from "@/features/services/User/User.schema";
+import { CreateUserDto, UpdateUserDto } from "@/features/services/User/User.schema";
 
 export namespace UserRepository {
   export async function create(
-    user: Pick<
-      typeof UserSchema,
-      "firstname" | "lastname" | "username" | "email" | "password"
-    >
+    user: CreateUserDto
   ) {
     return prisma.user.create({
       data: {
@@ -54,12 +51,7 @@ export namespace UserRepository {
 
   export async function update(
     userId: string,
-    user: Partial<
-      Pick<
-        typeof UserSchema,
-        "firstname" | "lastname" | "username" | "email" | "password" | "role"
-      >
-    >
+    user: UpdateUserDto
   ) {
     return prisma.user.update({
       where: {

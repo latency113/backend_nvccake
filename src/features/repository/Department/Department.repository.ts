@@ -1,9 +1,9 @@
 import prisma from "@/providers/database/database.provider";
-import { DepartmentSchema } from "@/features/services/Department/Department.schema";
+import { CreateDepartmentDto, UpdateDepartmentDto } from "@/features/services/Department/Department.schema";
 
 export namespace DepartmentRepository {
   export async function create(
-    department: Pick<typeof DepartmentSchema, "name">
+    department: CreateDepartmentDto
   ) {
     return prisma.department.create({
       data: {
@@ -29,9 +29,10 @@ export namespace DepartmentRepository {
       where,
       include: {
         classroom: {
-          include: {grade_level: true }
+          include: { grade_level: true },
         },
-        cakeRequest: true
+        teacher: true,
+        cakeRequest: true,
       },
       take: options.take,
       skip: options.skip,
@@ -43,12 +44,19 @@ export namespace DepartmentRepository {
       where: {
         id: departmentId,
       },
+      include: {
+        classroom: {
+          include: { grade_level: true },
+        },
+        teacher: true,
+        cakeRequest: true,
+      },
     });
   }
 
   export async function update(
     departmentId: string,
-    department: Partial<Pick<typeof DepartmentSchema, "name">>
+    department: UpdateDepartmentDto
   ) {
     return prisma.department.update({
       where: {
@@ -56,6 +64,14 @@ export namespace DepartmentRepository {
       },
       data: {
         ...department,
+      },
+    });
+  }
+
+  export async function findByName(name: string) {
+    return prisma.department.findUnique({
+      where: {
+        name: name,
       },
     });
   }

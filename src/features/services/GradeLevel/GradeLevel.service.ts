@@ -1,11 +1,11 @@
 import { GradeLevelRepository } from "@/features/repository/GradeLevel/GradeLevel.repository"
-import { GradeLevelSchema } from "./GradeLevel.schema";
+import { CreateGradeLevelDto, GradeLevelSchema, UpdateGradeLevelDto } from "./GradeLevel.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace GradeLevelService {
   export async function create(
-    GradeLevel: Omit<typeof GradeLevelSchema, "id">
+    GradeLevel: CreateGradeLevelDto
   ) {
     if (!GradeLevel.level) {
       throw new Error('GradeLevel level is required.');
@@ -14,14 +14,14 @@ export namespace GradeLevelService {
       throw new Error('GradeLevel year is required.');
     }
     try {
-      const newGradeLevel = GradeLevelRepository.create(GradeLevel);
+      const newGradeLevel = await GradeLevelRepository.create(GradeLevel);
       return newGradeLevel;
     } catch (error: any) {
       if (
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new Error("GradeLevelname already exists");
+        throw new Error("Duplicate GradeLevel (level, year) combination");
       }
       throw error;
     }
@@ -65,7 +65,7 @@ export namespace GradeLevelService {
 
   export async function update(
     GradeLevelId: string,
-    GradeLevel: Partial<Pick<typeof GradeLevelSchema, "name">>
+    GradeLevel: UpdateGradeLevelDto
   ) {
     try {
       const data = { ...GradeLevel };
@@ -75,7 +75,7 @@ export namespace GradeLevelService {
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new Error("GradeLevelname already exists");
+        throw new Error("Duplicate GradeLevel (level, year) combination");
       }
       throw error;
     }

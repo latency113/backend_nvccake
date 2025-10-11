@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import { ProductSchema, ProductWithRelationsSchema } from "../../services/Product/Product.schema";
+import { CreateProductDto, ProductSchema, ProductWithRelationsSchema, UpdateProductDto } from "../../services/Product/Product.schema";
 import { ProductService } from "../../services/Product/Product.service";
 
 export namespace ProductController {
@@ -28,7 +28,7 @@ export namespace ProductController {
         }
       },
       {
-        body: t.Omit(ProductSchema, ["id"]),
+        body: CreateProductDto,
         response: {
           201: t.Object({
             newProduct: ProductSchema,
@@ -145,7 +145,7 @@ export namespace ProductController {
         params: t.Object({
           productId: t.String(),
         }),
-        body: t.Partial(t.Omit(ProductSchema, ["id"])),
+        body: UpdateProductDto,
         response: {
           200: t.Object({
             updatedProduct: ProductSchema,

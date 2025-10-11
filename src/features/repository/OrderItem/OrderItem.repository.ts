@@ -1,13 +1,8 @@
+import { CreateOrderItemSchema, UpdateOrderItemSchema } from './../../services/OrderItem/OrderItem.schema';
 import prisma from "@/providers/database/database.provider";
 
 export namespace OrderItemRepository {
-  export async function create(orderItem: {
-    order_id: string;
-    product_id: string;
-    pound: number;
-    quantity: number;
-    unitPrice: number;
-  }) {
+  export async function create(orderItem: typeof CreateOrderItemSchema) {
     const product = await prisma.product.findUnique({
       where: { id: orderItem.product_id },
       select: { price: true },
@@ -67,14 +62,7 @@ export namespace OrderItemRepository {
 
   export async function update(
     orderItemId: string,
-    orderItem: Partial<{
-      order_id: string;
-      product_id: string;
-      pound: number;
-      quantity: number;
-      unitPrice: number;
-      subtotal: number;
-    }>
+    orderItem: typeof UpdateOrderItemSchema
   ) {
     let subtotalUpdate = {};
 

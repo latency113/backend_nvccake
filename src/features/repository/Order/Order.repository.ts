@@ -1,9 +1,9 @@
 import prisma from "@/providers/database/database.provider";
-import { OrderSchema } from "@/features/services/Order/Order.schema";
+import { CreateOrderDto, } from "@/features/services/Order/Order.schema";
 
 export namespace OrderRepository {
   export async function create(
-    order: Omit<typeof OrderSchema, "id" | "createdAt" | "updatedAt">
+    order: CreateOrderDto
   ) {
     return prisma.order.create({
       data: {
@@ -69,7 +69,7 @@ export namespace OrderRepository {
 
   export async function update(
     orderId: string,
-    order: Partial<Omit<typeof OrderSchema, "id" | "createdAt" | "updatedAt">>
+    order: UpdateOrderDto
   ) {
     return await prisma.order.update({
       where: {
@@ -97,13 +97,8 @@ export namespace OrderRepository {
       ? {
           OR: [
             {
-              customerName: {
-                contains: search,
-              },
-            },
-            {
               advisor: {
-                contains: options.search,
+                contains: search,
               },
             },
           ],

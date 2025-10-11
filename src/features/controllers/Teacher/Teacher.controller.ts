@@ -1,5 +1,10 @@
 import Elysia, { t } from "elysia";
-import { TeacherSchema, TeacherWithRelationsSchema } from "../../services/Teacher/Teacher.schema";
+import {
+  CreateTeacherDto,
+  TeacherSchema,
+  TeacherWithRelationsSchema,
+  UpdateTeacherDto,
+} from "../../services/Teacher/Teacher.schema";
 import { TeacherService } from "../../services/Teacher/Teacher.service";
 
 export namespace TeacherController {
@@ -10,9 +15,9 @@ export namespace TeacherController {
         try {
           const newTeacher = await TeacherService.create(body);
           set.status = 201;
-          return {  newTeacher, message: "Teacher has created" };
+          return { newTeacher, message: "Classroom has created" };
         } catch (error: any) {
-          if (error.message === "Teachername already exists") {
+          if (error.message === "Classroom name already exists") {
             set.status = "Conflict";
             return error.message;
           }
@@ -24,7 +29,7 @@ export namespace TeacherController {
         }
       },
       {
-        body: t.Omit(TeacherSchema, ["id"]),
+        body: CreateTeacherDto,
         response: {
           201: t.Object({
             newTeacher: TeacherSchema,
@@ -107,9 +112,12 @@ export namespace TeacherController {
       "/:TeacherId",
       async ({ params, body, set }) => {
         try {
-          const updateTeacher = await TeacherService.update(params.TeacherId, body);
+          const updateTeacher = await TeacherService.update(
+            params.TeacherId,
+            body
+          );
           set.status = "OK";
-          return {  updateTeacher, message: "Teacher has updated" };
+          return { updateTeacher, message: "Teacher has updated" };
         } catch (error: any) {
           if (error.message === "Teachername already exists") {
             set.status = "Conflict";
@@ -123,7 +131,7 @@ export namespace TeacherController {
         }
       },
       {
-        body: t.Partial(t.Omit(TeacherSchema, ["id"])),
+        body: UpdateTeacherDto,
         params: t.Object({
           TeacherId: t.String(),
         }),
@@ -139,9 +147,11 @@ export namespace TeacherController {
       "/:TeacherId",
       async ({ params, set }) => {
         try {
-          const deleteTeacher = await TeacherService.deleteById(params.TeacherId);
+          const deleteTeacher = await TeacherService.deleteById(
+            params.TeacherId
+          );
           set.status = "OK";
-          return {deleteTeacher, message: "Teacher has deleted"};
+          return { deleteTeacher, message: "Teacher has deleted" };
         } catch (error: any) {
           set.status = "Internal Server Error";
           if ("message" in error) {
@@ -160,5 +170,5 @@ export namespace TeacherController {
         },
         tags: ["Teachers"],
       }
-    )
+    );
 }

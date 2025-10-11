@@ -6,15 +6,30 @@ export const ClassroomSchema = t.Object({
   teacher_id: t.String(),
   department_id: t.String(),
   grade_level_id: t.String(),
+  students: t.Any(),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
 });
 
 export type Classroom = typeof ClassroomSchema.static;
+
+export const CreateClassroomDto = t.Object({
+  name: t.String(),
+  teacher_id: t.String(),
+  department_id: t.String(),
+  grade_level_id: t.String(),
+  students: t.Any(),
+});
+export type CreateClassroomDto = typeof CreateClassroomDto.static;
+
+export const UpdateClassroomDto = t.Partial(CreateClassroomDto);
+export type UpdateClassroomDto = typeof UpdateClassroomDto.static;
 
 // Define the teacher schema with classroom array
 const TeacherWithClassroomsSchema = t.Object({
   id: t.String(),
   name: t.String(),
-  classroom: t.Array(ClassroomSchema),
+  department_id: t.String(),
 });
 
 export const ClassroomWithAllRelationsSchema = t.Composite([
@@ -27,14 +42,13 @@ export const ClassroomWithAllRelationsSchema = t.Composite([
     }),
     grade_level: t.Object({
       id: t.String(),
-      level: t.UnionEnum(["VOCATIONAL","HIGHER"]),
-      year: t.Number()
+      level: t.UnionEnum(["VOCATIONAL", "HIGHER"]),
+      year: t.Number(),
     }),
-    teams: t.Array(t.Object({
-      id: t.String(),
-    })),
-    orders: t.Array(t.Object({
-      id: t.String(),
-    })),
+    orders: t.Array(
+      t.Object({
+        id: t.String(),
+      })
+    ),
   }),
 ]);

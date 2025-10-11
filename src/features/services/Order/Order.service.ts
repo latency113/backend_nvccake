@@ -1,11 +1,11 @@
 import { OrderRepository } from "@/features/repository/Order/Order.repository"
-import { OrderSchema } from "./Order.schema";
+import { CreateOrderDto, OrderSchema, UpdateOrderDto } from "./Order.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace OrderService {
   export async function create(
-    order: Omit<typeof OrderSchema, "id" | "createdAt" | "updatedAt">
+    order: CreateOrderDto
   ) {
     if (!order.customerName || order.customerName.trim() === '') {
       throw new Error('Customer name is required and cannot be empty.');
@@ -84,7 +84,7 @@ export namespace OrderService {
 
   export async function update(
     orderId: string,
-    data: Partial<Omit<typeof OrderSchema, "id" | "createdAt" | "updatedAt">>
+    data: UpdateOrderDto
   ) {
     if (data.totalPrice !== undefined && data.totalPrice < 0) {
       throw new Error('Total price cannot be negative.');

@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import { UserSchema } from "../../services/User/User.schema";
+import { CreateUserDto, UpdateUserDto, UserSchema } from "../../services/User/User.schema";
 import { UserService } from "../../services/User/User.service";
 import jwt from "@elysiajs/jwt";
 
@@ -25,7 +25,7 @@ export namespace UserController {
         }
       },
       {
-        body: t.Omit(UserSchema, ["id", "role", "createdAt", "updatedAt"]),
+        body: CreateUserDto,
         response: {
           201: t.Object({
             newUser: UserSchema,
@@ -124,7 +124,7 @@ export namespace UserController {
         }
       },
       {
-        body: t.Partial(t.Omit(UserSchema, ["id", "createdAt", "updatedAt"])),
+        body: UpdateUserDto,
         params: t.Object({
           userId: t.String(),
         }),

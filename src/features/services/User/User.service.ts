@@ -1,5 +1,5 @@
-import { UserRepository } from "@/features/repository/User/user.repository";
-import { UserSchema } from "./User.schema";
+import { UserRepository } from "@/features/repository/User/user.repository"
+import { CreateUserDto, UserSchema, UpdateUserDto } from "./User.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { TokenService } from "../Token/Token.service";
@@ -10,7 +10,7 @@ type JWTInstance = {
 
 export namespace UserService {
   export async function create(
-    user: Omit<typeof UserSchema, "id" | "createdAt" | "updatedAt">
+    user: CreateUserDto
   ) {
     if (!user.firstname || user.firstname.trim() === '') {
       throw new Error('User firstname is required and cannot be empty.');
@@ -79,12 +79,7 @@ export namespace UserService {
 
   export async function update(
     userId: string,
-    user: Partial<
-      Pick<
-        typeof UserSchema,
-        "firstname" | "lastname" | "username" | "email" | "password" | "role"
-      >
-    >
+    user: UpdateUserDto
   ) {
     try {
       const data = { ...user };

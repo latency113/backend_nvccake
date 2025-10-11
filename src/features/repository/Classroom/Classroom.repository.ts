@@ -1,13 +1,11 @@
 import prisma from "@/providers/database/database.provider";
-import { ClassroomSchema } from "@/features/services/Classroom/Classroom.schema";
+import {
+  CreateClassroomDto,
+  UpdateClassroomDto,
+} from "@/features/services/Classroom/Classroom.schema";
 
 export namespace ClassroomRepository {
-  export async function create(
-    Classroom: Pick<
-      typeof ClassroomSchema,
-      "name" | "teacher_id" | "department_id" | "gradeLevel_id"
-    >
-  ) {
+  export async function create(Classroom: CreateClassroomDto) {
     const teacher = await prisma.teacher.findUnique({
       where: { id: Classroom.teacher_id },
     });
@@ -20,14 +18,21 @@ export namespace ClassroomRepository {
       throw new Error(`Teacher with id ${Classroom.teacher_id} not found`);
     }
 
-    if (!department) {
-      throw new Error(`Department with id ${Classroom.department_id} not found`);
+    const grade_level = await prisma.gradeLevel.findUnique({
+      where: { id: Classroom.grade_level_id },
+    });
+
+    if (!grade_level) {
+      throw new Error(
+        `GradeLevel with id ${Classroom.grade_level_id} not found`
+      );
     }
 
     return prisma.classroom.create({
       data: {
         ...Classroom,
-    }})
+      },
+    });
   }
 
   export async function findAll(options: {
@@ -35,12 +40,21 @@ export namespace ClassroomRepository {
     take: number;
     search?: string;
   }) {
+    const where = options.search
+      ? {
+          name: {
+            contains: options.search,
+            mode: "insensitive",
+          },
+        }
+      : {};
+
     return prisma.classroom.findMany({
+      where,
       include: {
         department: true,
         grade_level: true,
         teacher: true,
-        teams: true,
         orders: true,
       },
       take: options.take,
@@ -53,17 +67,18 @@ export namespace ClassroomRepository {
       where: {
         id: ClassroomId,
       },
+      include: {
+        department: true,
+        grade_level: true,
+        teacher: true,
+        orders: true,
+      },
     });
   }
 
   export async function update(
     ClassroomId: string,
-    Classroom: Partial<
-      Pick<
-        typeof ClassroomSchema,
-        "teacher_id" | "department_id" | "gradeLevel_id"
-      >
-    >
+    Classroom: UpdateClassroomDto
   ) {
     return prisma.classroom.update({
       where: {

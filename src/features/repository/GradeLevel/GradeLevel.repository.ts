@@ -1,9 +1,9 @@
 import prisma from "@/providers/database/database.provider";
-import { GradeLevelSchema } from "@/features/services/GradeLevel/GradeLevel.schema";
+import { CreateGradeLevelDto, UpdateGradeLevelDto,  } from "@/features/services/GradeLevel/GradeLevel.schema";
 
 export namespace GradeLevelRepository {
   export async function create(
-    GradeLevel: Pick<typeof GradeLevelSchema, "level" | "year">
+    GradeLevel: CreateGradeLevelDto
   ) {
     return prisma.gradeLevel.create({
       data: {
@@ -17,7 +17,16 @@ export namespace GradeLevelRepository {
     take: number;
     search?: string;
   }) {
+    const where = options.search
+      ? {
+          level: {
+            contains: options.search,
+            mode: 'insensitive',
+          },
+        }
+      : {};
     return prisma.gradeLevel.findMany({
+      where,
       include: {
         classroom: true,
       },
@@ -31,12 +40,15 @@ export namespace GradeLevelRepository {
       where: {
         id: GradeLevelId,
       },
+      include: {
+        classroom: true,
+      },
     });
   }
 
   export async function update(
     GradeLevelId: string,
-    GradeLevel: Partial<Pick<typeof GradeLevelSchema, "level" | "year">>
+    GradeLevel: UpdateGradeLevelDto
   ) {
     return prisma.gradeLevel.update({
       where: {
@@ -59,8 +71,9 @@ export namespace GradeLevelRepository {
   export async function countAll(search?: string) {
     const where = search
       ? {
-          findAll: {
+          level: {
             contains: search,
+            mode: 'insensitive',
           },
         }
       : {};

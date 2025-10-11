@@ -1,17 +1,10 @@
 import { OrderItemRepository } from "@/features/repository/OrderItem/OrderItem.repository";
+import { CreateOrderItemSchema, UpdateOrderItemSchema } from "./OrderItem.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace OrderItemService {
-  export async function create(
-    orderItem: {
-      order_id: string;
-      product_id: string;
-      pound: number;
-      quantity: number;
-      unitPrice: number;
-    }
-  ) {
+  export async function create(orderItem: CreateOrderItemSchema) {
     if (orderItem.pound <= 0) {
       throw new Error('Pound must be greater than 0');
     }
@@ -81,13 +74,7 @@ export namespace OrderItemService {
 
   export async function update(
     orderItemId: string,
-    data: Partial<{
-      order_id: string;
-      product_id: string;
-      pound: number;
-      quantity: number;
-      unitPrice: number;
-    }>
+    data: UpdateOrderItemSchema
   ) {
     if (data.pound !== undefined && data.pound <= 0) {
       throw new Error('Pound must be greater than 0');

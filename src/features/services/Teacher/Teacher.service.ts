@@ -1,24 +1,30 @@
 import { TeacherRepository } from "@/features/repository/Teacher/Teacher.repository"
-import { TeacherSchema } from "./Teacher.schema";
+import { CreateTeacherDto, TeacherSchema, UpdateTeacherDto } from "./Teacher.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace TeacherService {
   export async function create(
-    Teacher: Omit<typeof TeacherSchema, "id">
+    teacher: CreateTeacherDto
   ) {
-    if (!Teacher.name || Teacher.name.trim() === '') {
+    if (!teacher.name || teacher.name.trim() === '') {
       throw new Error('Teacher name is required and cannot be empty.');
     }
+
+    const existingTeacher = await TeacherRepository.findByName(teacher.name);
+    if (existingTeacher) {
+      throw new Error("Teacher name already exists");
+    }
+
     try {
-      const newTeacher = TeacherRepository.create(Teacher);
+      const newTeacher = await TeacherRepository.create(teacher);
       return newTeacher;
     } catch (error: any) {
       if (
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new Error("Teachername already exists");
+        throw new Error("Teacher name already exists");
       }
       throw error;
     }
@@ -62,7 +68,7 @@ export namespace TeacherService {
 
   export async function update(
     TeacherId: string,
-    Teacher: Partial<Pick<typeof TeacherSchema, "name">>
+    Teacher: UpdateTeacherDto
   ) {
     try {
       const data = { ...Teacher };

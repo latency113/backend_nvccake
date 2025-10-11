@@ -1,11 +1,11 @@
 import { ProductRepository } from "@/features/repository/Product/Product.repository"
-import { ProductSchema } from "./Product.schema";
+import { CreateProductDto, ProductSchema, UpdateProductDto } from "./Product.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export namespace ProductService {
   export async function create(
-    product: Omit<typeof ProductSchema, "id">
+    product: CreateProductDto
   ) {
     if (!product.name || product.name.trim() === '') {
       throw new Error('Product name is required and cannot be empty.');
@@ -69,7 +69,7 @@ export namespace ProductService {
 
   export async function update(
     productId: string,
-    data: Partial<Omit<typeof ProductSchema, "id">>
+    data: UpdateProductDto
   ) {
     if (data.price !== undefined && data.price < 0) {
       throw new Error('Product price cannot be negative.');

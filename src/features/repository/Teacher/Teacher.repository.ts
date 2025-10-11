@@ -1,9 +1,9 @@
 import prisma from "@/providers/database/database.provider";
-import { TeacherSchema } from "@/features/services/Teacher/Teacher.schema";
+import { CreateTeacherDto, UpdateTeacherDto } from "@/features/services/Teacher/Teacher.schema";
 
 export namespace TeacherRepository {
   export async function create(
-    teacher: Pick<typeof TeacherSchema, "name">
+    teacher: CreateTeacherDto
   ) {
     return prisma.teacher.create({
       data: {
@@ -33,11 +33,6 @@ export namespace TeacherRepository {
             grade_level: true,
             department: true,
             teacher: true,
-            teams: {
-              select: {
-                id: true
-              }
-            },
             orders: {
               select: {
                 id: true
@@ -50,11 +45,35 @@ export namespace TeacherRepository {
       skip: options.skip,
     });
 
-    // Transform each teacher to ensure classroom array is present
-    return teachers.map(teacher => ({
-      ...teacher,
-      classroom: teacher.classroom || [] // Ensure classroom is always an array
-    }));
+    // Manually fetch teams for each classroom
+    const teachersWithTeams = await Promise.all(
+      teachers.map(async (teacher) => {
+        const classroomsWithTeams = await Promise.all(
+          (teacher.classroom || []).map(async (classroom) => {
+            const teams = await prisma.team.findMany({
+              where: {
+                classroom_ids: {
+                  has: classroom.id
+                }
+              },
+              select: {
+                id: true
+              }
+            });
+            return {
+              ...classroom,
+              teams,
+            };
+          })
+        );
+        return {
+          ...teacher,
+          classroom: classroomsWithTeams,
+        };
+      })
+    );
+
+    return teachersWithTeams;
   }
 
   export async function findById(teacherId: string) {
@@ -62,12 +81,26 @@ export namespace TeacherRepository {
       where: {
         id: teacherId,
       },
+      include: {
+        classroom: {
+          include: {
+            grade_level: true,
+            department: true,
+            teacher: true,
+            orders: {
+              select: {
+                id: true
+              }
+            }
+          }
+        }
+      },
     });
   }
 
   export async function update(
     teacherId: string,
-    teacher: Partial<Pick<typeof TeacherSchema, "name">>
+    teacher: UpdateTeacherDto
   ) {
     return prisma.teacher.update({
       where: {
@@ -75,6 +108,14 @@ export namespace TeacherRepository {
       },
       data: {
         ...teacher,
+      },
+    });
+  }
+
+  export async function findByName(name: string) {
+    return prisma.teacher.findUnique({
+      where: {
+        name: name,
       },
     });
   }

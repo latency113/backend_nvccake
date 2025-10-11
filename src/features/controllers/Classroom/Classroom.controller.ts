@@ -1,18 +1,18 @@
 import Elysia, { t } from "elysia";
-import { ClassroomSchema, ClassroomWithAllRelationsSchema } from "../../services/Classroom/Classroom.schema";
+import { ClassroomSchema, ClassroomWithAllRelationsSchema, CreateClassroomDto, UpdateClassroomDto } from "../../services/Classroom/Classroom.schema";
 import { ClassroomService } from "../../services/Classroom/Classroom.service";
 
 export namespace ClassroomController {
-  export const classroomController = new Elysia({ prefix: "/Classrooms" })
+  export const classroomController = new Elysia({ prefix: "/classrooms" })
     .post(
       "/",
       async ({ body, set }) => {
         try {
           const newClassroom = await ClassroomService.create(body);
           set.status = 201;
-          return {  newClassroom, message: "Classroom has created" };
+          return { newClassroom, message: "Classroom has created" };
         } catch (error: any) {
-          if (error.message === "Classroomname already exists") {
+          if (error.message === "Classroom name already exists") {
             set.status = "Conflict";
             return error.message;
           }
@@ -24,14 +24,14 @@ export namespace ClassroomController {
         }
       },
       {
-        body: t.Omit(ClassroomSchema, ["id"]),
+        body: CreateClassroomDto,
         response: {
           201: t.Object({
             newClassroom: ClassroomSchema,
             message: t.String(),
           }),
           409: t.String(),
-          500: t.String(),
+          500: t.String(),  
         },
         tags: ["Classrooms"],
       }
@@ -123,7 +123,7 @@ export namespace ClassroomController {
         }
       },
       {
-        body: t.Partial(t.Omit(ClassroomSchema, ["id"])),
+        body: UpdateClassroomDto,
         params: t.Object({
           ClassroomId: t.String(),
         }),

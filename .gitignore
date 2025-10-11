@@ -42,4 +42,4 @@ package-lock.json
 **/*.bun
 /src/providers/database/generated
 .env
-/dist
+./dist

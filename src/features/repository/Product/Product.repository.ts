@@ -1,9 +1,9 @@
 import prisma from "@/providers/database/database.provider";
-import { ProductSchema } from "@/features/services/Product/Product.schema";
+import { CreateProductDto, UpdateProductDto,  } from "@/features/services/Product/Product.schema";
 
 export namespace ProductRepository {
   export async function create(
-    product: Pick<typeof ProductSchema, "name" | "price">
+    product: CreateProductDto
   ) {
     return prisma.product.create({
       data: {
@@ -64,7 +64,7 @@ export namespace ProductRepository {
 
   export async function update(
     productId: string,
-    product: Partial<Pick<typeof ProductSchema, "name" | "price" >>
+    product: UpdateProductDto
   ) {
     return await prisma.product.update({
       where: {

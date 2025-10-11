@@ -1,27 +1,42 @@
 import { t } from "elysia";
-
-export const OrderStatus = t.UnionEnum(["pending", "complete", "cancelled"]);
-
 export const OrderSchema = t.Object({
   id: t.String(),
   customerName: t.String(),
   classroom_id: t.Optional(t.String()),
-  team_id: t.Optional(t.String()),
+  team_id: t.Optional(t.Nullable(t.String())),
   orderDate: t.Date(),
   totalPrice: t.Number(),
   book_number: t.Number(),
   number: t.Number(),
   phone: t.String(),
   pickup_date: t.Date(),
-  depository: t.Optional(t.String()),
   deposit: t.Number(),
   advisor: t.String(),
-  status: OrderStatus,
+  status: t.UnionEnum(["pending","complete","cancelled"]),
   createdAt: t.Date(),
   updatedAt: t.Date(),
 });
 
 export type Order = typeof OrderSchema.static;
+
+export const CreateOrderDto = t.Object({
+  customerName: t.String(),
+  classroom_id: t.Optional(t.String()),
+  team_id: t.Optional(t.Nullable(t.String())),
+  orderDate: t.Date(),
+  totalPrice: t.Number(),
+  book_number: t.Number(),
+  number: t.Number(),
+  phone: t.String(),
+  pickup_date: t.Date(),
+  deposit: t.Number(),
+  advisor: t.String(),
+  status: t.Optional(t.UnionEnum(["pending","complete","cancelled"])),
+});
+export type CreateOrderDto = typeof CreateOrderDto.static;
+
+export const UpdateOrderDto = t.Partial(CreateOrderDto);
+export type UpdateOrderDto = typeof UpdateOrderDto.static;
 
 // Reference schemas to avoid circular dependencies
 const ClassroomReferenceSchema = t.Object({
@@ -33,9 +48,9 @@ const ClassroomReferenceSchema = t.Object({
 });
 
 const TeamReferenceSchema = t.Object({
-  id: t.String(),
-  name: t.String(),
-  classroom_id: t.String(),
+  id: t.Optional(t.String()),
+  name: t.Optional(t.String()),
+  classroom_id: t.Optional(t.String()),
 });
 
 const OrderItemReferenceSchema = t.Object({
@@ -54,7 +69,7 @@ export const OrderWithRelationsSchema = t.Composite([
   OrderSchema,
   t.Object({
     classroom: t.Optional(ClassroomReferenceSchema),
-    team: t.Optional(TeamReferenceSchema),
+    team: t.Nullable(TeamReferenceSchema),
     order_items: t.Array(OrderItemReferenceSchema),
   }),
 ]);

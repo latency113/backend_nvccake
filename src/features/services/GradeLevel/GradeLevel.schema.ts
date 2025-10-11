@@ -8,6 +8,15 @@ export const GradeLevelSchema = t.Object({
 
 export type GradeLevel = typeof GradeLevelSchema.static
 
+export const CreateGradeLevelDto = t.Object({
+  level: t.UnionEnum(["VOCATIONAL", "HIGHER"]),
+  year: t.Number(),
+});
+export type CreateGradeLevelDto = typeof CreateGradeLevelDto.static;
+
+export const UpdateGradeLevelDto = t.Partial(CreateGradeLevelDto);
+export type UpdateGradeLevelDto = typeof UpdateGradeLevelDto.static;
+
 export const GradeLevelWithRelationsSchema = t.Composite([
   GradeLevelSchema,
   t.Object({

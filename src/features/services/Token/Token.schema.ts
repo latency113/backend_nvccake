@@ -1,19 +1,31 @@
-import { z } from 'zod';
+import { t } from "elysia";
+import { UserSchema } from "../User/User.schema";
 
-export const createTokenSchema = z.object({
-  token: z.string(),
-  user_id: z.string(),
-  expires_at: z.date()
+export const TokenSchema = t.Object({
+  id: t.String(),
+  token: t.String(),
+  user_id: t.String(),
+  expires_at: t.Date(),
+  created_at: t.Date(),
+  updated_at: t.Date(),
 });
 
-export const verifyTokenSchema = z.object({
-  token: z.string()
-});
+export type Token = typeof TokenSchema.static;
 
-export const userIdSchema = z.object({
-  user_id: z.string()
+export const CreateTokenDto = t.Object({
+  user_id: t.String(),
+  expires_in: t.Optional(t.Number()), // in days
 });
+export type CreateTokenDto = typeof CreateTokenDto.static;
 
-export type CreateToken = z.infer<typeof createTokenSchema>;
-export type VerifyToken = z.infer<typeof verifyTokenSchema>;
-export type userId = z.infer<typeof userIdSchema>;
+export const VerifyTokenDto = t.Object({
+  token: t.String(),
+});
+export type VerifyTokenDto = typeof VerifyTokenDto.static;
+
+export const TokenWithRelationsSchema = t.Composite([
+  TokenSchema,
+  t.Object({
+    user: UserSchema,
+  }),
+]);

@@ -1,6 +1,7 @@
 import Elysia, { t } from "elysia";
 import { TeamSchema, TeamWithRelationsSchema } from "../../services/Team/Team.schema";
 import { TeamService } from "../../services/Team/Team.service";
+import { CreateTeacherDto, UpdateTeacherDto } from "@/features/services/Teacher/Teacher.schema";
 
 export namespace TeamController {
   export const teamController = new Elysia({ prefix: "/teams" })
@@ -24,7 +25,7 @@ export namespace TeamController {
         }
       },
       {
-        body: t.Omit(TeamSchema, ["id"]),
+        body: CreateTeacherDto,
         response: {
           201: t.Object({
             newTeam: TeamSchema,
@@ -136,7 +137,7 @@ export namespace TeamController {
         params: t.Object({
           teamId: t.String(),
         }),
-        body: t.Partial(t.Omit(TeamSchema, ["id"])),
+        body: UpdateTeacherDto,
         response: {
           200: t.Object({
             updatedTeam: TeamSchema,
