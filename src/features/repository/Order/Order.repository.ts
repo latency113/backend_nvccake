@@ -118,4 +118,15 @@ export namespace OrderRepository {
       },
     });
   }
+
+  export async function findByTeamId(teamId: string) {
+    return prisma.order.findMany({
+      where: {
+        team_id: teamId,
+      },
+      include: {
+        order_items: true,
+      },
+    });
+  }
 }

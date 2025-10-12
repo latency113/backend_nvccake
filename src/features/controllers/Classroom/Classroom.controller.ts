@@ -1,10 +1,15 @@
 import Elysia, { t } from "elysia";
-import { ClassroomSchema, ClassroomWithAllRelationsSchema, CreateClassroomDto, UpdateClassroomDto } from "../../services/Classroom/Classroom.schema";
+import {
+  ClassroomSchema,
+  ClassroomWithAllRelationsSchema,
+  CreateClassroomDto,
+  UpdateClassroomDto,
+} from "../../services/Classroom/Classroom.schema";
 import { ClassroomService } from "../../services/Classroom/Classroom.service";
 
 export namespace ClassroomController {
   export const classroomController = new Elysia({ prefix: "/classrooms" })
-        .post(
+    .post(
       "/:ClassroomId/upload-students",
       async ({ params, body, set }) => {
         try {
@@ -16,10 +21,8 @@ export namespace ClassroomController {
             return "No file uploaded.";
           }
 
-          const updatedClassroom = await ClassroomService.uploadStudentsFromExcel(
-            ClassroomId,
-            file
-          );
+          const updatedClassroom =
+            await ClassroomService.uploadStudentsFromExcel(ClassroomId, file);
 
           set.status = "OK";
           return {
@@ -57,9 +60,30 @@ export namespace ClassroomController {
       "/",
       async ({ body, set }) => {
         try {
-          const newClassroom = await ClassroomService.create(body);
+          const { file, ...classroomData } = body; // Destructure file and classroomData
+
+          // 1. Create the classroom
+          const newClassroom = await ClassroomService.create(
+            classroomData as CreateClassroomDto
+          ); // Cast to CreateClassroomDto
+
+          // 2. If a file was provided, upload students
+          if (file) {
+            await ClassroomService.uploadStudentsFromExcel(
+              newClassroom.id,
+              file
+            );
+          }
+
           set.status = 201;
-          return { newClassroom, message: "Classroom has created" };
+          // Fetch the classroom again to include the updated students data in the response
+          const classroomWithStudents = await ClassroomService.findById(
+            newClassroom.id
+          );
+          return {
+            newClassroom: classroomWithStudents,
+            message: "Classroom has created and students uploaded",
+          };
         } catch (error: any) {
           if (error.message === "Classroom name already exists") {
             set.status = "Conflict";
@@ -73,14 +97,21 @@ export namespace ClassroomController {
         }
       },
       {
-        body: CreateClassroomDto,
+        body: t.Object({
+          name: t.String(),
+          teacher_id: t.String(),
+          department_id: t.String(),
+          grade_level_id: t.String(),
+          file: t.File(),
+        }),
+        type: "formdata", // Important for file uploads
         response: {
           201: t.Object({
-            newClassroom: ClassroomSchema,
+            newClassroom: ClassroomWithAllRelationsSchema, // Updated to include students
             message: t.String(),
           }),
           409: t.String(),
-          500: t.String(),  
+          500: t.String(),
         },
         tags: ["Classrooms"],
       }
@@ -140,7 +171,9 @@ export namespace ClassroomController {
       async ({ params, set }) => {
         try {
           const { ClassroomId } = params;
-          const result = await ClassroomService.getStudentsWithCakePounds(ClassroomId);
+          const result = await ClassroomService.getStudentsWithCakePounds(
+            ClassroomId
+          );
           set.status = "OK";
           return result;
         } catch (error: any) {
@@ -157,11 +190,13 @@ export namespace ClassroomController {
         }),
         response: {
           200: t.Object({
-            students: t.Array(t.Object({
-              number: t.String(),
-              name: t.String(),
-              totalPounds: t.Number(),
-            })),
+            students: t.Array(
+              t.Object({
+                number: t.String(),
+                name: t.String(),
+                totalPounds: t.Number(),
+              })
+            ),
             totalPoundsForClassroom: t.Number(),
           }),
           500: t.String(),
@@ -172,7 +207,9 @@ export namespace ClassroomController {
     .get(
       "/:ClassroomId",
       async ({ params }) => {
-        const getClassroomById = await ClassroomService.findById(params.ClassroomId);
+        const getClassroomById = await ClassroomService.findById(
+          params.ClassroomId
+        );
         return getClassroomById;
       },
       {
@@ -190,9 +227,12 @@ export namespace ClassroomController {
       "/:ClassroomId",
       async ({ params, body, set }) => {
         try {
-          const updateClassroom = await ClassroomService.update(params.ClassroomId, body);
+          const updateClassroom = await ClassroomService.update(
+            params.ClassroomId,
+            body
+          );
           set.status = "OK";
-          return {  updateClassroom, message: "Classroom has updated" };
+          return { updateClassroom, message: "Classroom has updated" };
         } catch (error: any) {
           if (error.message === "Classroomname already exists") {
             set.status = "Conflict";
@@ -222,9 +262,11 @@ export namespace ClassroomController {
       "/:ClassroomId",
       async ({ params, set }) => {
         try {
-          const deleteClassroom = await ClassroomService.deleteById(params.ClassroomId);
+          const deleteClassroom = await ClassroomService.deleteById(
+            params.ClassroomId
+          );
           set.status = "OK";
-          return {deleteClassroom, message: "Classroom has deleted"};
+          return { deleteClassroom, message: "Classroom has deleted" };
         } catch (error: any) {
           set.status = "Internal Server Error";
           if ("message" in error) {
@@ -243,5 +285,5 @@ export namespace ClassroomController {
         },
         tags: ["Classrooms"],
       }
-    )
+    );
 }

@@ -2,6 +2,7 @@ import { OrderItemRepository } from "@/features/repository/OrderItem/OrderItem.r
 import { CreateOrderItemSchema, UpdateOrderItemSchema } from "./OrderItem.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { TeamService } from "@/features/services/Team/Team.service";
 
 export namespace OrderItemService {
   export async function create(orderItem: CreateOrderItemSchema) {
@@ -17,6 +18,9 @@ export namespace OrderItemService {
 
     try {
       const newOrderItem = await OrderItemRepository.create(orderItem);
+      if (newOrderItem.order.team_id) {
+        await TeamService.recalculateTeamSales(newOrderItem.order.team_id);
+      }
       return newOrderItem;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -92,7 +96,11 @@ export namespace OrderItemService {
     }
 
     try {
-      return await OrderItemRepository.update(orderItemId, data);
+      const updatedOrderItem = await OrderItemRepository.update(orderItemId, data);
+      if (updatedOrderItem.order.team_id) {
+        await TeamService.recalculateTeamSales(updatedOrderItem.order.team_id);
+      }
+      return updatedOrderItem;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === "P2003") {
@@ -109,6 +117,14 @@ export namespace OrderItemService {
       throw new Error("Order item not found");
     }
 
-    return await OrderItemRepository.remove(orderItemId);
+    const teamId = existingOrderItem.order.team_id;
+
+    const removedOrderItem = await OrderItemRepository.remove(orderItemId);
+
+    if (teamId) {
+      await TeamService.recalculateTeamSales(teamId);
+    }
+
+    return removedOrderItem;
   }
 }

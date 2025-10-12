@@ -21,10 +21,10 @@ export namespace ClassroomService {
       // เริ่มจากแถว 11 (index 10)
       const row = data[i];
       const studentId = row[2] || "";
-      const fullName = row[3] || "";
+      const studentName = row[3] || "";
 
-      if (studentId && fullName) {
-        students.push({ studentId, fullName });
+      if (studentId && studentName) {
+        students.push({ studentId, studentName });
       }
     }
 

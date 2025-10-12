@@ -115,6 +115,14 @@ export namespace OrderItemRepository {
     });
   }
 
+  export async function removeByOrderId(orderId: string) {
+    return await prisma.orderItem.deleteMany({
+      where: {
+        order_id: orderId,
+      },
+    });
+  }
+
   export async function countAll(orderId?: string) {
     const where = orderId ? { order_id: orderId } : undefined;
     return await prisma.orderItem.count({ where });

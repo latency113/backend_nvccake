@@ -2,6 +2,8 @@ import { TeamRepository } from "@/features/repository/Team/Team.repository";
 import { CreateTeamDto, TeamSchema, UpdateTeamDto } from "./Team.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { OrderRepository } from "@/features/repository/Order/Order.repository";
+import { OrderItemRepository } from "@/features/repository/OrderItem/OrderItem.repository";
 
 export namespace TeamService {
   export async function create(
@@ -106,5 +108,53 @@ export namespace TeamService {
       }
       throw error;
     }
+  }
+
+  export async function updateTeamSales(
+    teamId: string,
+    poundsChange: number,
+    bahtChange: number
+  ) {
+    const team = await TeamRepository.findById(teamId);
+    if (!team) {
+      throw new Error("Team not found");
+    }
+
+    const newTotalSalesPounds = (team.total_sales_pounds || 0) + poundsChange;
+    const newTotalSalesBaht = (team.total_sales_baht || 0) + bahtChange;
+
+    await TeamRepository.update(teamId, {
+      total_sales_pounds: newTotalSalesPounds,
+      total_sales_baht: newTotalSalesBaht,
+    });
+  }
+
+  export async function recalculateTeamSales(teamId: string) {
+    console.log("recalculateTeamSales: Starting for teamId:", teamId);
+    const team = await TeamRepository.findById(teamId);
+    if (!team) {
+      console.error("recalculateTeamSales: Team not found for teamId:", teamId);
+      throw new Error("Team not found");
+    }
+    console.log("recalculateTeamSales: Fetched team:", team);
+
+    const orders = await OrderRepository.findByTeamId(teamId);
+    console.log("recalculateTeamSales: Fetched orders for team:", orders);
+    let totalPounds = 0;
+    let totalBaht = 0;
+
+    for (const order of orders) {
+      for (const item of order.order_items) {
+        totalPounds += item.pound * item.quantity;
+        totalBaht += item.subtotal;
+      }
+    }
+    console.log("recalculateTeamSales: Calculated totalPounds:", totalPounds, "totalBaht:", totalBaht);
+
+    await TeamRepository.update(teamId, {
+      total_sales_pounds: totalPounds,
+      total_sales_baht: totalBaht,
+    });
+    console.log("recalculateTeamSales: Team sales updated for teamId:", teamId);
   }
 }

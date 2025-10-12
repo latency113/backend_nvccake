@@ -98,10 +98,13 @@ model User {
 }
 
 model Team {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  classroom_ids String[] @db.ObjectId
-  team_type     TeamType
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  classroom_ids       String[] @db.ObjectId
+  student_member_name String[]  @map("studentMemberName")
+  total_sales_pounds  Float?   @map("totalSalesPounds")
+  total_sales_baht    Float?   @map("totalSalesBaht")
+  team_type           TeamType
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

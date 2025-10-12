@@ -7,6 +7,9 @@ export const TeamSchema = t.Object({
   team_type: t.UnionEnum(["team", "person"]),
   createdAt: t.Date(),
   updatedAt: t.Date(),
+  student_member_name: t.Optional(t.Array(t.String())),
+  total_sales_pounds: t.Optional(t.Nullable(t.Number())),
+  total_sales_baht: t.Optional(t.Nullable(t.Number())),
 });
 
 export type Team = typeof TeamSchema.static;
@@ -15,6 +18,7 @@ export const CreateTeamDto = t.Object({
   name: t.String(),
   classroom_ids: t.Array(t.String()),
   team_type: t.UnionEnum(["team", "person"]),
+  student_member_name: t.Array(t.String()),
 });
 export type CreateTeamDto = typeof CreateTeamDto.static;
 export const UpdateTeamDto = t.Partial(CreateTeamDto);

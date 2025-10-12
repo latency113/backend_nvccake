@@ -10,6 +10,7 @@ export namespace TeamRepository {
         name: team.name,
         classroom_ids: team.classroom_ids,
         team_type: team.team_type,
+        student_member_name: team.student_member_name,
       },
     });
   }
@@ -135,6 +136,9 @@ export namespace TeamRepository {
         ...(team.name !== undefined && { name: team.name }),
         ...(team.classroom_ids !== undefined && { classroom_ids: team.classroom_ids }),
         ...(team.team_type !== undefined && { team_type: team.team_type }),
+        ...(team.student_member_name !== undefined && { student_member_name: team.student_member_name }),
+        ...(team.total_sales_pounds !== undefined && { total_sales_pounds: team.total_sales_pounds }),
+        ...(team.total_sales_baht !== undefined && { total_sales_baht: team.total_sales_baht }),
       },
     });
   }

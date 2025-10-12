@@ -2,6 +2,9 @@ import { OrderRepository } from "@/features/repository/Order/Order.repository"
 import { CreateOrderDto, OrderSchema, UpdateOrderDto } from "./Order.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { OrderItemRepository } from "@/features/repository/OrderItem/OrderItem.repository";
+import { TeamRepository } from "@/features/repository/Team/Team.repository";
+import { TeamService } from "@/features/services/Team/Team.service";
 
 export namespace OrderService {
   export async function create(
@@ -31,6 +34,12 @@ export namespace OrderService {
 
     try {
       const newOrder = await OrderRepository.create(order);
+
+      if (newOrder.team_id) {
+        console.log("OrderService.create: Recalculating team sales for team_id:", newOrder.team_id);
+        await TeamService.recalculateTeamSales(newOrder.team_id);
+      }
+
       return newOrder;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -109,7 +118,27 @@ export namespace OrderService {
     }
 
     try {
-      return await OrderRepository.update(orderId, data);
+      const existingOrder = await OrderRepository.findById(orderId);
+      if (!existingOrder) {
+        throw new Error("Order not found");
+      }
+
+      const updatedOrder = await OrderRepository.update(orderId, data);
+
+      const oldTeamId = existingOrder.team_id;
+      const newTeamId = updatedOrder.team_id;
+
+      if (oldTeamId) {
+        console.log("OrderService.update: Recalculating team sales for oldTeamId:", oldTeamId);
+        await TeamService.recalculateTeamSales(oldTeamId);
+      }
+
+      if (newTeamId && newTeamId !== oldTeamId) {
+        console.log("OrderService.update: Recalculating team sales for newTeamId:", newTeamId);
+        await TeamService.recalculateTeamSales(newTeamId);
+      }
+
+      return updatedOrder;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === "P2025") {
@@ -125,7 +154,23 @@ export namespace OrderService {
 
   export async function remove(orderId: string) {
     try {
-      return await OrderRepository.remove(orderId);
+      const orderToDelete = await OrderRepository.findById(orderId);
+      if (!orderToDelete) {
+        throw new Error("Order not found");
+      }
+
+      // Delete all associated order items first
+      await OrderItemRepository.removeByOrderId(orderId);
+
+      // Then delete the order
+      await OrderRepository.remove(orderId);
+
+      // Recalculate team sales if the order was associated with a team
+      if (orderToDelete.team_id) {
+        await TeamService.recalculateTeamSales(orderToDelete.team_id);
+      }
+
+      return { message: "Order and its items deleted successfully" };
     } catch (error) {
       if (
         error instanceof PrismaClientKnownRequestError &&
