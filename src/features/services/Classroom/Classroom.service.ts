@@ -71,7 +71,9 @@ export namespace ClassroomService {
         // Assumption: Order.customerName matches student.name
         if (order.customerName === student.name) {
           for (const orderItem of order.order_items) {
-            studentTotalPounds += orderItem.pound;
+            if (orderItem.product.name.toLowerCase().includes("cake")) {
+              studentTotalPounds += orderItem.pound;
+            }
           }
         }
       }
