@@ -1,6 +1,9 @@
 import Elysia, { t } from "elysia";
 import { TokenService } from "../../services/Token/Token.service";
-import { CreateTokenDto, VerifyTokenDto } from "@/features/services/Token/Token.schema";
+import {
+  CreateTokenDto,
+  VerifyTokenDto,
+} from "@/features/services/Token/Token.schema";
 
 export namespace TokenController {
   export const tokenController = new Elysia({ prefix: "/tokens" })
@@ -38,6 +41,7 @@ export namespace TokenController {
       },
       {
         params: VerifyTokenDto,
+        tags: ["Token"],
       }
     )
     .get(
@@ -68,6 +72,7 @@ export namespace TokenController {
       },
       {
         params: VerifyTokenDto,
+        tags: ["Token"],
       }
     )
     .delete(

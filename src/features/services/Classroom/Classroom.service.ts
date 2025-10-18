@@ -3,6 +3,7 @@ import { CreateClassroomDto, UpdateClassroomDto } from "./Classroom.schema";
 import { getPaginationParams } from "@/shared/utils/pagination";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as XLSX from "xlsx";
+import { StudentService } from "../student/student.service";
 
 export namespace ClassroomService {
   export async function uploadStudentsFromExcel(
@@ -24,7 +25,7 @@ export namespace ClassroomService {
       const studentName = row[3] || "";
 
       if (studentId && studentName) {
-        students.push({ studentId, studentName });
+        students.push({ number: studentId, name: studentName });
       }
     }
 
@@ -51,40 +52,11 @@ export namespace ClassroomService {
       throw new Error(`Classroom with ID ${classroomId} not found.`);
     }
 
-    const studentsData: {
-      number: string;
-      name: string;
-      totalPounds: number;
-    }[] = [];
-    let totalPoundsForClassroom = 0;
+    console.log("Classroom students data:", classroom.students);
 
-    // Assuming classroom.students is an array of { number: string, name: string }
-    const studentsInClassroom = classroom.students as {
-      number: string;
-      name: string;
-    }[];
-
-    for (const student of studentsInClassroom) {
-      let studentTotalPounds = 0;
-
-      for (const order of classroom.orders) {
-        // Assumption: Order.customerName matches student.name
-        if (order.customerName === student.name) {
-          for (const orderItem of order.order_items) {
-            if (orderItem.product.name.toLowerCase().includes("cake")) {
-              studentTotalPounds += orderItem.pound;
-            }
-          }
-        }
-      }
-      studentsData.push({ ...student, totalPounds: studentTotalPounds });
-      totalPoundsForClassroom += studentTotalPounds;
-    }
-
-    return {
-      students: studentsData,
-      totalPoundsForClassroom,
-    };
+    const studentService = new StudentService();
+    const result = await studentService.getTotalPoundsPerStudentByClassroom(classroomId, classroom.students as { number: string; name: string; }[]);
+    return result;
   }
 
   export async function create(Classroom: CreateClassroomDto) {

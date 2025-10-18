@@ -131,7 +131,7 @@ model Order {
   orderDate    DateTime
   totalPrice   Float
   book_number  Int
-  number       Int
+  number       Int         @unique
   phone        String
   pickup_date  DateTime
   deposit      Int
@@ -144,7 +144,6 @@ model Order {
   team      Team?      @relation(fields: [team_id], references: [id])
   classroom Classroom? @relation(fields: [classroom_id], references: [id])
 
-  @@unique([book_number, number])
   @@index([classroom_id], name: "idx_order_classroom_id")
   @@index([team_id], name: "idx_order_team_id")
 }
