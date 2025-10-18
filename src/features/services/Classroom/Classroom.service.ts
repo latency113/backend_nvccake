@@ -20,12 +20,12 @@ export namespace ClassroomService {
 
     for (let i = 10; i < data.length; i++) {
       // เริ่มจากแถว 11 (index 10)
-      const row = data[i];
-      const studentId = row[2] || "";
-      const studentName = row[3] || "";
+      const row = data[i] as any[];
+      const studentId = (row[2] || "").toString().trim();
+      const studentName = (row[3] || "").toString().trim();
 
       if (studentId && studentName) {
-        students.push({ number: studentId, name: studentName });
+        students.push({ studentId: studentId, studentName: studentName });
       }
     }
 
@@ -54,8 +54,18 @@ export namespace ClassroomService {
 
     console.log("Classroom students data:", classroom.students);
 
+    // Validate and filter students data
+    let students: { studentId: string; studentName: string }[] = [];
+    if (Array.isArray(classroom.students)) {
+      students = (classroom.students as any[]).filter(
+        (s): s is { studentId: string; studentName: string } =>
+          s && typeof s.studentId === 'string' && s.studentId.trim() !== '' &&
+          typeof s.studentName === 'string'
+      );
+    }
+
     const studentService = new StudentService();
-    const result = await studentService.getTotalPoundsPerStudentByClassroom(classroomId, classroom.students as { number: string; name: string; }[]);
+    const result = await studentService.getTotalPoundsPerStudentByClassroom(classroomId, students);
     return result;
   }
 
@@ -78,26 +88,40 @@ export namespace ClassroomService {
   }
 
   export async function findAll(
-    options: { page?: number; itemsPerPage?: number; search?: string } = {}
+    options: { page?: number; itemsPerPage?: number; search?: string, department_id?: string } = {}
   ) {
     const page = options.page ?? 1;
     const itemsPerPage = options.itemsPerPage ?? 10;
     const search = options.search;
+    const department_id = options.department_id;
 
     const { skip, take } = getPaginationParams(page, itemsPerPage);
     const Classrooms = await ClassroomRepository.findAll({
       skip,
       take,
       search,
+      department_id
     });
-    const total = await ClassroomRepository.countAll(search);
+
+    // Sanitize students data
+    const sanitizedClassrooms = Classrooms.map((classroom) => {
+      if (classroom.students && Array.isArray(classroom.students)) {
+        const students = (classroom.students as any[]).filter(s => s && typeof s.studentId === 'string' && s.studentId.trim() !== '');
+        classroom.students = students;
+      } else {
+        classroom.students = []; // Ensure students is always an array
+      }
+      return classroom;
+    });
+
+    const total = await ClassroomRepository.countAll(search, department_id);
 
     const totalPages = ((total + itemsPerPage - 1) / itemsPerPage) >> 0;
     const nextPage = page < totalPages;
     const previousPage = page > 1;
 
     return {
-      data: Classrooms,
+      data: sanitizedClassrooms,
       meta_data: {
         page,
         itemsPerPage,

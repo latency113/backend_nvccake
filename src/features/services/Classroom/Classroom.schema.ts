@@ -1,12 +1,17 @@
 import { t } from "elysia";
 
+const StudentSchema = t.Object({
+  studentId: t.String(),
+  studentName: t.String(),
+});
+
 export const ClassroomSchema = t.Object({
   id: t.String(),
   name: t.String(),
   teacher_id: t.String(),
   department_id: t.String(),
   grade_level_id: t.String(),
-  students: t.Any(),
+  students: t.Optional(t.Array(StudentSchema)),
   createdAt: t.Date(),
   updatedAt: t.Date(),
 });
@@ -18,7 +23,7 @@ export const CreateClassroomDto = t.Object({
   teacher_id: t.String(),
   department_id: t.String(),
   grade_level_id: t.String(),
-  students: t.Any(),
+  students: t.Optional(t.Array(StudentSchema)),
 });
 export type CreateClassroomDto = typeof CreateClassroomDto.static;
 

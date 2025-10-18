@@ -39,8 +39,9 @@ export namespace ClassroomRepository {
     skip: number;
     take: number;
     search?: string;
+    department_id?: string;
   }) {
-    const where = options.search
+    const where: any = options.search
       ? {
           name: {
             contains: options.search,
@@ -48,6 +49,10 @@ export namespace ClassroomRepository {
           },
         }
       : {};
+
+    if (options.department_id) {
+      where.department_id = options.department_id;
+    }
 
     return prisma.classroom.findMany({
       where,
@@ -106,14 +111,18 @@ export namespace ClassroomRepository {
     });
   }
 
-  export async function countAll(search?: string) {
-    const where = search
+  export async function countAll(search?: string, department_id?: string) {
+    const where: any = search
       ? {
           name: {
             contains: search,
           },
         }
       : {};
+
+    if (department_id) {
+      where.department_id = department_id;
+    }
     return await prisma.classroom.count({ where });
   }
 }

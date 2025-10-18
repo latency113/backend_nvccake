@@ -32,7 +32,10 @@ export class StudentService {
     return studentPounds;
   }
 
-  async getTotalPoundsPerStudentByClassroom(classroomId: string, classroomStudents: { number: string; name: string; }[]) {
+  async getTotalPoundsPerStudentByClassroom(
+    classroomId: string,
+    classroomStudents: { studentId: string; studentName: string; }[] = []
+  ) {
     const orders = await prisma.order.findMany({
       where: {
         classroom_id: classroomId,
@@ -69,7 +72,11 @@ export class StudentService {
     const studentsWithPounds = classroomStudents.map(student => {
       const normalizedStudentName = (student.studentName ?? '').toLowerCase().trim();
       const totalPounds = studentPoundsMap[normalizedStudentName] || 0;
-      return { ...student, totalPounds: totalPounds };
+      return {
+        number: student.studentId,
+        name: student.studentName,
+        totalPounds: totalPounds
+      };
     });
 
     return {

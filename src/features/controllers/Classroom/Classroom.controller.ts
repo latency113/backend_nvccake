@@ -145,6 +145,7 @@ export namespace ClassroomController {
           page: t.Optional(t.Numeric()),
           itemsPerPage: t.Optional(t.Numeric()),
           search: t.Optional(t.String()),
+          department_id: t.Optional(t.String()),
         }),
         response: {
           200: t.Object({
